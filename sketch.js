@@ -11,7 +11,6 @@ class Character {
   };
 
   /**
-   * 
    * @param {Character} target 
    */
   attack(target) {
@@ -24,6 +23,10 @@ class Character {
     return this.hitPoints > 0;
   }
 
+  /**
+   * 
+   * @param {Number} value 
+   */
   takeHit(value) {
     if (value > 0) {
       this.hitPoints -= value;
@@ -34,6 +37,10 @@ class Character {
     }
   }
 
+  /**
+   * 
+   * @param {Card} card 
+   */
   addCard(card) {
     this.deck.cards.push(card);
   }
