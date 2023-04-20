@@ -1,2 +1,11 @@
 # QueenBetty
-A game based on probabilities
+Un jeu de type Rogue-like (ex: Slay the Spire) avec des combats tour par tour.
+Le joueur a un deck de cartes représentant les attaques qu'il peut effectuer.
+Ici, les effets de cartes (sauf une, l'attaque de base) auront un effet basé sur une loi de probabilité.
+
+## Où est-ce qu'il y aura des probas ?
+- Une loi uniforme pour sélectionner du texte aléatoire affiché.
+- Une loi par carte :
+  - géométrique : L'attaque continue jusqu'à qu'une rate
+
+On ajoutera à cette description les lois utilisées quand on les aura apprises.
