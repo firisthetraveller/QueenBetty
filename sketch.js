@@ -31,9 +31,6 @@ class Character {
     if (value > 0) {
       this.hitPoints -= value;
       console.log(this.name + " takes " + value + " damage.");
-      if (!this.isAlive()) {
-        console.log(this.name + " fell in battle.");
-      }
     }
   }
 
@@ -101,10 +98,14 @@ const geometricAttackCard = new Card("Geometric card", "A flurry of attacks, end
         console.log(target.name + " dodged the last one.");
     }
   }
+
+  if (i > 1) {
+    console.log(target.name + " took a total of " + 4 * i + " damage.");
+  }
 });
 
 let player = new Character("Player", { x: 30, y: 200 });
-let enemy = new Character("Bad Guy", { x: 360, y: 200 }, 20);
+let enemy = new Character("Bad Guy", { x: 360, y: 200 });
 
 player.addCard(baseAttackCard);
 player.addCard(headTailsAttackCard);
@@ -125,9 +126,14 @@ function draw() {
     player.attack(enemy);
     if (enemy.isAlive()) {
       enemy.attack(player);
+      if (!player.isAlive()) {
+        console.log("Oh no, you're dead. Refresh the page to retry.");
+      }
+    } else {
+      console.log(enemy.name + " fell in battle.");
     }
 
-    console.log("Player: " + player.hitPoints);
-    console.log("Enemy: " + enemy.hitPoints);
+    console.log("Player: " + player.hitPoints + " HP");
+    console.log("Enemy: " + enemy.hitPoints + " HP");
   }
 }
