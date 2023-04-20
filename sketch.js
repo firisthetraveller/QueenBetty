@@ -1,87 +1,103 @@
-function Character(name, position, hp = 100, attack = 10) {
-  const draw = () => {
-    rect(position.x, position.y, 10);
+class Character {
+  constructor(name, position, hp = 100) {
+    this.name = name;
+    this.position = position;
+    this.hitPoints = hp;
+    this.deck = new Deck();
+  }
+
+  draw = () => {
+    rect(this.position.x, this.position.y, 10);
   };
 
-  function attack(target) {
+  /**
+   * 
+   * @param {Character} target 
+   */
+  attack(target) {
     let card = this.drawCard();
-    console.log(name + " uses " + card.name + "!");
+    console.log(this.name + " uses " + card.name + "!");
     card.effect(target);
   }
 
-  function isAlive() {
+  isAlive() {
     return this.hitPoints > 0;
   }
 
-  function takeHit(value) {
+  takeHit(value) {
     if (value > 0) {
       this.hitPoints -= value;
-      console.log(this.name + " takes " + value + "damage.");
+      console.log(this.name + " takes " + value + " damage.");
       if (!this.isAlive()) {
         console.log(this.name + " fell in battle.");
       }
-    } else {
-      console.log("Lucky! " + this.name + " dodged the attack.");
     }
   }
 
-  function addCard(card) {
+  addCard(card) {
     this.deck.cards.push(card);
   }
 
-  function drawCard() {
+  drawCard() {
     return this.deck.draw();
   }
-
-  return {
-    name,
-    deck: Deck(),
-    hitPoints: hp,
-    draw,
-    attack,
-    isAlive,
-    takeHit,
-    addCard,
-    drawCard
-  };
 }
 
-function Card(name, description, effect) {
-  return {
-    name,
-    description,
-    effect
+class Card {
+  constructor(name, description, effect) {
+    this.name = name;
+    this.description = description;
+    this.effect = effect;
   }
 }
 
-function Deck() {
-  let cards = [];
+class Deck {
+  constructor() {
+    this.cards = [];
+  }
 
-  function draw() {
-    if (cards.length > 0) {
-      return cards[int(Math.random() * cards.length)]
+  draw() {
+    if (this.cards.length > 0) {
+      return this.cards[int(Math.random() * this.cards.length)]
     }
   }
-
-  return {
-    cards,
-    draw
-  }
 }
 
-const enemyBaseAttackCard = Card("Base attack", "-", (target) => target.takeHit(10));
-const baseAttackCard = Card("Base attack", "-", (target) => target.takeHit(10));
-const headTailsAttackCard = Card("Heads or tails", "Strong attack. Accuracy: 50%", (target) => {
-  (Math.random() > 0.5) ? target.takeHit(20) : target.takeHit(3);
+const enemyBaseAttackCard = new Card("Base attack", "-", (target) => target.takeHit(10));
+const baseAttackCard = new Card("Base attack", "-", (target) => target.takeHit(10));
+const headTailsAttackCard = new Card("Heads or tails", "Strong attack. Accuracy: 50%", (target) => {
+  if (Math.random() > 0.5) {
+    console.log("Lucky! A strong hit landed!");
+    target.takeHit(20);
+  } else {
+    let rand = int(Math.random() * 3);
+    switch (rand) {
+      case 0: console.log("Shucks! You slipped on a banana!"); break;
+      case 1: console.log("You had an urge to sneeze! A-A-Achoo!"); break;
+      case 2: console.log("The enemy barely dodged the attack."); break;
+    }
+    target.takeHit(3);
+  }
 });
-const geometricAttackCard = Card("Geometric card", "A flurry of attacks, ending when an attack misses. Accuracy: 80%", (target) => {
-  while (Math.random() > 0.2)
+const geometricAttackCard = new Card("Geometric card", "A flurry of attacks, ending when an attack misses. Accuracy: 80%", (target) => {
+  let i = 0;
+  while (Math.random() > 0.2) {
     target.takeHit(4);
-  target.takeHit(0);
+    i++;
+  }
+  if (target.isAlive()) {
+    switch (i) {
+      case 0: console.log(target.name + " was ready for it and dodged the attack."); break;
+      case 1:
+        console.log(target.name + " SDI'd so hard that he is already out of range."); break;
+      default:
+        console.log(target.name + " dodged the last one.");
+    }
+  }
 });
 
-let player = Character("Player", { x: 30, y: 200 });
-let enemy = Character("Bad Guy", { x: 360, y: 200 }, 20, 5);
+let player = new Character("Player", { x: 30, y: 200 });
+let enemy = new Character("Bad Guy", { x: 360, y: 200 }, 20);
 
 player.addCard(baseAttackCard);
 player.addCard(headTailsAttackCard);
@@ -91,7 +107,6 @@ enemy.addCard(enemyBaseAttackCard);
 
 function setup() {
   createCanvas(400, 400);
-
 }
 
 function draw() {
@@ -104,5 +119,8 @@ function draw() {
     if (enemy.isAlive()) {
       enemy.attack(player);
     }
+
+    console.log("Player: " + player.hitPoints);
+    console.log("Enemy: " + enemy.hitPoints);
   }
 }
