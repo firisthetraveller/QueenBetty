@@ -69,13 +69,13 @@ function Deck() {
   }
 }
 
-const enemyBaseAttackCard = Card("Attaque de base", "-", (target) => target.takeHit(10));
-const baseAttackCard = Card("Attaque de base", "-", (target) => target.takeHit(10));
-const headTailsAttackCard = Card("Heads or tails", "Attaque forte, une fois sur deux", (target) => {
+const enemyBaseAttackCard = Card("Base attack", "-", (target) => target.takeHit(10));
+const baseAttackCard = Card("Base attack", "-", (target) => target.takeHit(10));
+const headTailsAttackCard = Card("Heads or tails", "Strong attack. Accuracy: 50%", (target) => {
   (Math.random() > 0.5) ? target.takeHit(20) : target.takeHit(3);
 });
-const geometricAttackCard = Card("Geometric card", "Attaque forte, une fois sur deux", (target) => {
-  while (Math.random() > 0.25)
+const geometricAttackCard = Card("Geometric card", "A flurry of attacks, ending when an attack misses. Accuracy: 80%", (target) => {
+  while (Math.random() > 0.2)
     target.takeHit(4);
   target.takeHit(0);
 });
