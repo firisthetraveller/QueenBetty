@@ -11,3 +11,6 @@ Ici, les effets de cartes (sauf une, l'attaque de base) auront un effet basé su
   - géométrique : L'attaque continue jusqu'à qu'une rate
 
 On ajoutera à cette description les lois utilisées quand on les aura apprises.
+
+## Comment tester (provisoire)
+Il faut manuellement ouvrir le fichier index.html dans le navigateur.
