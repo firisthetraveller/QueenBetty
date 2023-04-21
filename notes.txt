@@ -1,0 +1,11 @@
+
+// Si à la partie précédente j'ai utilisé une binomiale, j'ai moins de chance d'utiliser une binomiale à la partie d'après
+// -> chaine de markov
+// En fonction e la loi uitlisée au coup précédent, on va utiliser une loi suivante
+// Une matrice pour chaque joueur
+// Complexifier : changer les distributions en fonction de si le joueur a gagné ou perdu
+
+
+// Joueur vs ordi
+// le joueur peut choisir la loi avec laquelle il va jouer
+// si l'ordi perd, il n'est pas content : au tour suivant il joue avec une binomiale dont l'espérance est égale au dégat qui ont été infligés à la dernière partie : il cherche à compenser en espérance les dégats qui ont été infligés à la partie précédente
