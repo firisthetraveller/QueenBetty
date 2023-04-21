@@ -83,6 +83,7 @@ const headTailsAttackCard = new Card("Heads or tails", "Strong attack. Accuracy:
     target.takeHit(3);
   }
 });
+
 const geometricAttackCard = new Card("Geometric card", "A flurry of attacks, ending when an attack misses. Accuracy: 80%", (target) => {
   let i = 0;
   while (Math.random() > 0.2) {
@@ -104,36 +105,53 @@ const geometricAttackCard = new Card("Geometric card", "A flurry of attacks, end
   }
 });
 
-let player = new Character("Player", { x: 30, y: 200 });
-let enemy = new Character("Bad Guy", { x: 360, y: 200 });
+class Game {
+  constructor() {
+    this.player1 = new Character("Player", { x: 30, y: 200 });
+    this.player2 = new Character("Bad Guy", { x: 360, y: 200 });
+  }
 
-player.addCard(baseAttackCard);
-player.addCard(headTailsAttackCard);
-player.addCard(geometricAttackCard);
+  setup() {
+    this.player1.addCard(baseAttackCard);
+    this.player1.addCard(headTailsAttackCard);
+    this.player1.addCard(geometricAttackCard);
 
-enemy.addCard(enemyBaseAttackCard);
+    this.player2.addCard(enemyBaseAttackCard);
+  }
+
+  draw() {
+    this.player1.draw();
+    this.player2.draw();
+  }
+
+  update() {
+    if (this.player1.isAlive() && this.player2.isAlive()) {
+      this.player1.attack(this.player2);
+      if (this.player2.isAlive()) {
+        this.player2.attack(this.player1);
+        if (!this.player1.isAlive()) {
+          console.log("Oh no, you're dead. Refresh the page to retry.");
+        }
+      } else {
+        console.log(this.player2.name + " fell in battle.");
+      }
+
+      console.log("Player 1: " + this.player1.hitPoints + " HP");
+      console.log("Player 2: " + this.player2.hitPoints + " HP");
+    }
+  }
+}
+
+let game = new Game();
 
 function setup() {
   createCanvas(400, 400);
+  game.setup();
 }
 
 function draw() {
   background(220);
-  player.draw();
-  enemy.draw();
 
-  if (player.isAlive() && enemy.isAlive()) {
-    player.attack(enemy);
-    if (enemy.isAlive()) {
-      enemy.attack(player);
-      if (!player.isAlive()) {
-        console.log("Oh no, you're dead. Refresh the page to retry.");
-      }
-    } else {
-      console.log(enemy.name + " fell in battle.");
-    }
-
-    console.log("Player: " + player.hitPoints + " HP");
-    console.log("Enemy: " + enemy.hitPoints + " HP");
-  }
+  game.draw();
+  game.update();
 }
