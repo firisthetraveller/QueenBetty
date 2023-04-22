@@ -85,6 +85,18 @@ const BernouilliCard = (parameter, damage) => {
   });
 };
 
+const UniformCard = (maxRoll, damage) => {
+  return new Card("Uniform card", "An attack for gamblers. Accuracy: 100%. Damage: #diceroll * " + damage, (target) => {
+    let roll = int(Math.random() * maxRoll) + 1;
+    console.log("A '" + roll + "' has been rolled.");
+    target.takeHit(roll * damage);
+  });
+};
+
+const DiceCard = (damage) => {
+  return UniformCard(6, damage);
+}
+
 /**
  * 
  * @param {Number} damage The damage dealt on each hit
@@ -140,11 +152,11 @@ class Game {
   }
 
   setup() {
-    this.player1.addCard(BaseAttackCard(10));
     this.player1.addCard(CoinThrowCard(20));
     this.player1.addCard(GeometricCard(0.8, 4));
+    this.player1.addCard(DiceCard(3));
 
-    this.player2.addCard(BaseAttackCard(10));
+    this.player2.addCard(UniformCard(10, 2));
   }
 
   draw() {
