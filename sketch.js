@@ -55,6 +55,80 @@ class Card {
   }
 }
 
+class BaseAttackCard extends Card {
+  /**
+   * 
+   * @param {Number} damage 
+   */
+  constructor(damage) {
+    super("Base attack", "A simple attack.", (target) => target.takeHit(damage));
+  }
+}
+
+class BernoulliCard extends Card {
+  /**
+   * 
+   * @param {Number} parameter The probability of success for each hit
+   * @param {Number} damage The damage dealt on each hit
+   */
+  constructor(parameter, damage) {
+    super("Heads or tails", "A strong attack. Accuracy: " + (parameter * 100) + "%", (target) => {
+      if (Math.random() > parameter) {
+        console.log("Lucky! A strong hit landed!");
+        target.takeHit(damage);
+      } else {
+        let rand = int(Math.random() * 3);
+        switch (rand) {
+          case 0: console.log("Shucks! You slipped on a banana! The attack missed."); break;
+          case 1: console.log("You had an urge to sneeze! A-A-Achoo! The attack missed."); break;
+          case 2: console.log("The enemy swiftly dodged the attack. The attack missed."); break;
+        }
+      }
+    });
+  }
+}
+
+class CoinThrowCard extends BernoulliCard {
+  /**
+   * 
+   * @param {String} name
+   * @param {Number} damage The damage dealt on each hit
+   */
+  constructor(name, damage) {
+    super(name, 0.5, damage);
+  }
+}
+
+class GeometryCard extends Card {
+  /**
+   * 
+   * @param {Number} parameter The probability of success for each hit
+   * @param {Number} damage The damage dealt on each hit
+   */
+  constructor(parameter, damage) {
+    super("Geometric card", "A flurry of attacks, ending when an attack misses. Accuracy: " + (parameter * 100) + "%", (target) => {
+      let i = 0;
+      while (Math.random() > (1 - parameter)) {
+        target.takeHit(damage);
+        i++;
+      }
+      if (target.isAlive()) {
+        switch (i) {
+          case 0: console.log(target.name + " was ready for it and dodged the attack."); break;
+          case 1:
+            console.log(target.name + " SDI'd so hard that he is already out of range."); break;
+          default:
+            console.log(target.name + " dodged the last one.");
+        }
+      }
+
+      if (i > 1) {
+        console.log(target.name + " took a total of " + damage * i + " damage.");
+      }
+    });
+  }
+}
+
 class Deck {
   constructor() {
     this.cards = [];
@@ -67,44 +141,6 @@ class Deck {
   }
 }
 
-const enemyBaseAttackCard = new Card("Base attack", "-", (target) => target.takeHit(10));
-const baseAttackCard = new Card("Base attack", "-", (target) => target.takeHit(10));
-const headTailsAttackCard = new Card("Heads or tails", "Strong attack. Accuracy: 50%", (target) => {
-  if (Math.random() > 0.5) {
-    console.log("Lucky! A strong hit landed!");
-    target.takeHit(20);
-  } else {
-    let rand = int(Math.random() * 3);
-    switch (rand) {
-      case 0: console.log("Shucks! You slipped on a banana!"); break;
-      case 1: console.log("You had an urge to sneeze! A-A-Achoo!"); break;
-      case 2: console.log("The enemy barely dodged the attack."); break;
-    }
-    target.takeHit(3);
-  }
-});
-
-const geometricAttackCard = new Card("Geometric card", "A flurry of attacks, ending when an attack misses. Accuracy: 80%", (target) => {
-  let i = 0;
-  while (Math.random() > 0.2) {
-    target.takeHit(4);
-    i++;
-  }
-  if (target.isAlive()) {
-    switch (i) {
-      case 0: console.log(target.name + " was ready for it and dodged the attack."); break;
-      case 1:
-        console.log(target.name + " SDI'd so hard that he is already out of range."); break;
-      default:
-        console.log(target.name + " dodged the last one.");
-    }
-  }
-
-  if (i > 1) {
-    console.log(target.name + " took a total of " + 4 * i + " damage.");
-  }
-});
-
 class Game {
   constructor() {
     this.player1 = new Character("Player", { x: 30, y: 200 });
@@ -112,11 +148,11 @@ class Game {
   }
 
   setup() {
-    this.player1.addCard(baseAttackCard);
-    this.player1.addCard(headTailsAttackCard);
-    this.player1.addCard(geometricAttackCard);
+    this.player1.addCard(new BaseAttackCard(10));
+    this.player1.addCard(new CoinThrowCard(20));
+    this.player1.addCard(new GeometryCard(0.8, 4));
 
-    this.player2.addCard(enemyBaseAttackCard);
+    this.player2.addCard(new BaseAttackCard(10));
   }
 
   draw() {
@@ -136,8 +172,8 @@ class Game {
         console.log(this.player2.name + " fell in battle.");
       }
 
-      console.log("Player 1: " + this.player1.hitPoints + " HP");
-      console.log("Player 2: " + this.player2.hitPoints + " HP");
+      console.log(this.player1.name + ": " + this.player1.hitPoints + " HP");
+      console.log(this.player2.name + ": " + this.player2.hitPoints + " HP");
     }
   }
 }
