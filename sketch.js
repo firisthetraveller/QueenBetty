@@ -1,3 +1,20 @@
+const getNextProbabilities = (matrix, current) => {
+  return matrix[current]
+}
+
+const getRandomInWeightedArray = (array) => {
+  let rand = Math.random();
+  let res = 0;
+  let i = 0;
+
+  while (res < rand) {
+    res += array[i];
+    i++;
+  }
+
+  return i;
+}
+
 class Character {
   constructor(name, position, hp = 100) {
     this.name = name;
@@ -45,6 +62,19 @@ class Character {
   drawCard() {
     return this.deck.draw();
   }
+
+  useMarkov(matrix) {
+    let probs = getNextProbabilities(matrix, this.state);
+    return this.deck[getRandomInWeightedArray(probs)];
+  }
+}
+
+const UniformStrategy = (character) => {
+  character.drawCard();
+}
+
+const MarkovStrategy = (character, matrix) => {
+  character.useMarkov(matrix);
 }
 
 class Card {
@@ -145,7 +175,7 @@ class Deck {
   }
 }
 
-class Game {
+class Battle {
   constructor() {
     this.player1 = new Character("Player", { x: 30, y: 200 });
     this.player2 = new Character("Bad Guy", { x: 360, y: 200 });
@@ -153,7 +183,7 @@ class Game {
 
   setup() {
     this.player1.addCard(CoinThrowCard(20));
-    this.player1.addCard(GeometricCard(0.8, 4));
+    this.player1.addCard(GeometricCard(0.8, 2));
     this.player1.addCard(DiceCard(3));
 
     this.player2.addCard(UniformCard(10, 2));
@@ -182,16 +212,16 @@ class Game {
   }
 }
 
-let game = new Game();
+let battle = new Battle();
 
 function setup() {
   createCanvas(400, 400);
-  game.setup();
+  battle.setup();
 }
 
 function draw() {
   background(220);
 
-  game.draw();
-  game.update();
+  battle.draw();
+  battle.update();
 }
