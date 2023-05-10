@@ -1,0 +1,47 @@
+html{
+    margin:0;
+    background-color: #242424;
+}
+
+header{
+    height:70px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header .pc_zone{
+    background-color: violet;
+    flex-grow: 2;
+}
+
+header .player_zone{
+    background-color: yellow;
+    flex-grow: 2;
+}
+
+h1{
+    text-align: center;
+    flex-grow: 2;
+    background-color: orange;
+}
+
+
+.game_zone{
+    background-image: url("img/game.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 500px;
+}
+
+.cards_zone{
+    height:200px;
+    background-color: green;
+}
+
+footer{
+    color:white;
+    background-color: #242424;
+    height:40px;
+}
