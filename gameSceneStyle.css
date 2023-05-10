@@ -11,22 +11,44 @@ header{
     align-items: center;
 }
 
+header div{
+    margin:10px;
+}
+
 header .pc_zone{
-    background-color: #242424;
     color:white;
+    display: flex;
     flex-grow: 2;
+    flex-direction: row;
 }
 
 header .player_zone{
-    background-color: #242424;
     color:white;
+    display: flex;
     flex-grow: 2;
+    flex-direction: row;
+}
+
+header .player_life{
+    background-color: #242424;
+    flex-grow: 4;
+}
+
+header .pc_life{
+    background-color: #242424;
+    flex-grow: 4;
+}
+
+
+header img{
+    height:50px;
+    width:50px;
+    flex-grow: 1;
 }
 
 h1{
     text-align: center;
     flex-grow: 2;
-    background-color: pink;
 }
 
 
@@ -35,6 +57,25 @@ h1{
     background-repeat: no-repeat;
     background-size: cover;
     height: 500px;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-evenly;
+}
+
+.player{
+    height: 280px;
+    width:180px;
+    margin-top:220px;
+    /* margin-left: 250px; */
+
+}
+
+.pc{
+    height: 300px;
+    width:200px;
+    /* /* margin-top:210px; */
+    /* margin-right: 320px; */ 
 }
 
 .cards_zone{
