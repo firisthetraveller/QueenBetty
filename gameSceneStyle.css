@@ -1,6 +1,6 @@
 html{
     margin:0;
-    background-color: #242424;
+    background-color: #FEFAEF;
 }
 
 header{
@@ -12,19 +12,21 @@ header{
 }
 
 header .pc_zone{
-    background-color: violet;
+    background-color: #242424;
+    color:white;
     flex-grow: 2;
 }
 
 header .player_zone{
-    background-color: yellow;
+    background-color: #242424;
+    color:white;
     flex-grow: 2;
 }
 
 h1{
     text-align: center;
     flex-grow: 2;
-    background-color: orange;
+    background-color: pink;
 }
 
 
@@ -37,7 +39,19 @@ h1{
 
 .cards_zone{
     height:200px;
-    background-color: green;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-left: 10px;
+    padding-right: 10px;
+
+}
+
+.cards_zone .card{
+    height:180px;
+    width:200px;
+    background-color: pink;
+    margin: 10px;
 }
 
 footer{
