@@ -71,7 +71,8 @@ h1 {
     flex-grow: 2;
 }
 
-.game_zone {
+
+/* .game_zone {
     background-image: url("img/game.png");
     background-repeat: no-repeat;
     background-size: cover;
@@ -80,6 +81,19 @@ h1 {
     flex-direction: row;
     align-items: baseline;
     justify-content: space-evenly;
+} */
+
+.game_zone {
+    background-image: url("img/game.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 500px;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-evenly;
+    /* J'ai rajouté ça pour que l'image arrête de trop bouger */
+    background-position: center;
 }
 
 .player {
