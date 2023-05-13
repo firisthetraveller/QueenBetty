@@ -7,10 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="gameSceneStyle.css">
 
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet">
+
     <title>GameScene</title>
 </head>
 
-<body>
+<body class="container">
     <header>
         <div class="player_zone">
             <img src="img/Cacahuete_en_attente.svg" alt="" class="profile">
@@ -42,11 +47,66 @@
             <div class="card"></div>
         </section>
         <footer>
-            ici les liens pour revenir a l'accueil, quitter ect
-            <a href="menuScene.html">Retour</a>
+            <div class="footer_buttons">
+                <a href="menuScene.html">&larr; Retour au menu</a>
+                <a href="" class="modal-button-rules">Règles</a>
+                <a href="" class="modal-button-commandes">Commandes</a>
+            </div>
         </footer>
     </main>
+    <div class="modal-rules">
+        <div class="modal">
+            <h2>Règles du jeu</h2>
+            <p>Voici les règles du jeu :</p>
+            <ul>
+                <li>Règle 1</li>
+                <li>Règle 2</li>
+                <li>Règle 3</li>
+            </ul>
+            <button class="close-button">Fermer</button>
+        </div>
+    </div>
+    <div class="modal-commandes">
+        <div class="modal">
+            <h2>Règles du jeu</h2>
+            <p>Voici les commandes du jeu :</p>
+            <ul>
+                <li>Commande 1</li>
+                <li>Commande 2</li>
+                <li>Commande 3</li>
+            </ul>
+            <button class="close-button">Fermer</button>
+        </div>
+    </div>
+    <script>
+        const modalButtonRules = document.querySelector('.modal-button-rules');
+        const modalRules = document.querySelector('.modal-rules');
 
+        const modalButtonCommandes = document.querySelector('.modal-button-commandes');
+        const modalCommandes = document.querySelector('.modal-commandes');
+
+        const closeButton = document.querySelectorAll('.close-button');
+        let activeModal = null;
+
+        modalButtonRules.addEventListener('click', function(event) {
+            event.preventDefault();
+            modalRules.classList.add('active');
+            activeModal = modalRules;
+        });
+
+        modalButtonCommandes.addEventListener('click', function(event) {
+            event.preventDefault();
+            modalCommandes.classList.add('active');
+            activeModal = modalCommandes;
+        });
+
+        for (let i = 0; i < closeButton.length; i++) {
+            closeButton[i].addEventListener('click', function() {
+                activeModal.classList.remove('active');
+                activeModal = null;
+            });
+        }
+    </script>
 </body>
 
 </html>
