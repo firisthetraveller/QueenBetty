@@ -1,6 +1,6 @@
 html{
     margin:0;
-    background-color: #FEFAEF;
+    background-color: white;
 }
 
 header{
@@ -56,7 +56,7 @@ h1{
     background-image: url("img/game.png");
     background-repeat: no-repeat;
     background-size: cover;
-    height: 500px;
+    height: 580px;
     display: flex;
     flex-direction: row;
     align-items: baseline;
