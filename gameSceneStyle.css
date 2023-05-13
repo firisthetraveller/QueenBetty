@@ -1,58 +1,56 @@
-html{
-    margin:0;
+html {
+    margin: 0;
     background-color: #FEFAEF;
 }
 
-header{
-    height:70px;
+header {
+    height: 70px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
 
-header div{
-    margin:10px;
+header div {
+    margin: 10px;
 }
 
-header .pc_zone{
-    color:white;
+header .pc_zone {
+    color: white;
     display: flex;
     flex-grow: 2;
     flex-direction: row;
 }
 
-header .player_zone{
-    color:white;
+header .player_zone {
+    color: white;
     display: flex;
     flex-grow: 2;
     flex-direction: row;
 }
 
-header .player_life{
+header .player_life {
     background-color: #242424;
     flex-grow: 4;
 }
 
-header .pc_life{
+header .pc_life {
     background-color: #242424;
     flex-grow: 4;
 }
 
-
-header img{
-    height:50px;
-    width:50px;
+header img {
+    height: 50px;
+    width: 50px;
     flex-grow: 1;
 }
 
-h1{
+h1 {
     text-align: center;
     flex-grow: 2;
 }
 
-
-.game_zone{
+.game_zone {
     background-image: url("img/game.png");
     background-repeat: no-repeat;
     background-size: cover;
@@ -61,42 +59,42 @@ h1{
     flex-direction: row;
     align-items: baseline;
     justify-content: space-evenly;
+    /* J'ai rajouté ça pour que l'image arrête de trop bouger */
+    background-position: center;
 }
 
-.player{
+.player {
     height: 280px;
-    width:180px;
-    margin-top:220px;
+    width: 180px;
+    margin-top: 220px;
     /* margin-left: 250px; */
-
 }
 
-.pc{
+.pc {
     height: 300px;
-    width:200px;
+    width: 200px;
     /* /* margin-top:210px; */
-    /* margin-right: 320px; */ 
+    /* margin-right: 320px; */
 }
 
-.cards_zone{
-    height:200px;
+.cards_zone {
+    height: 200px;
     display: flex;
     flex-direction: row;
     justify-content: center;
     padding-left: 10px;
     padding-right: 10px;
-
 }
 
-.cards_zone .card{
-    height:180px;
-    width:200px;
+.cards_zone .card {
+    height: 180px;
+    width: 200px;
     background-color: pink;
     margin: 10px;
 }
 
-footer{
-    color:white;
+footer {
+    color: white;
     background-color: #242424;
-    height:40px;
+    height: 40px;
 }
