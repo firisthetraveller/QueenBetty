@@ -66,9 +66,11 @@ class Character {
    * @param {Number} value 
    */
   takeHit(value) {
+    this.hitPoints -= value;
     if (value > 0) {
-      this.hitPoints -= value;
       console.log(this.name + " takes " + value + " damage.");
+    } else if (value < 0) {
+      console.log(this.name + " recovers " + -value + " HP.");
     }
   }
 
@@ -260,19 +262,50 @@ class Hand {
   }
 };
 
+let WeatherQueue = [];
+
+const exp = (n, lambda) => 1 - Math.exp(-lambda * n);
+const expInv = (rand, lambda) => {
+  let i = 0;
+  while (exp(i, lambda) < rand) {
+    i++;
+  }
+  return i;
+}
+
 class Weather {
   constructor(parameter, effect) {
     this.parameter = parameter;
     this.effect = effect;
+    this.arm();
   }
 
-  occur() {
-    this.effect();
+  arm() {
+    this.countdown = expInv(Math.random(), this.parameter);
+  }
+
+  tick() {
+    this.countdown--;
+    if (this.countdown == 0) {
+      WeatherQueue.push(this.effect);
+      this.arm();
+    }
   }
 };
 
-const Catastrophe = (param, damage) => {
-  return new Weather(param, (target1, target2) => { target1.takeHit(damage); target2.takeHit(damage); });
+const Catastrophe = (param, value) => {
+  return new Weather(param, (targets) => {
+    console.error("A catastrophe occurred!");
+    targets.forEach(t => t.takeHit(value));
+  });
+};
+
+const Blessing = (param, value) => {
+  return new Weather(param, (targets) => {
+    console.error("A soothing breeze is gently caressing both players.");
+    targets.forEach(t => t.takeHit(-value));
+  }
+  );
 };
 
 class Battle {
@@ -289,7 +322,8 @@ class Battle {
 
     this.player2.addCard(UniformCard(10, 2));
 
-    this.effects.push(Catastrophe())
+    this.effects.push(Catastrophe(0.3, 9));
+    this.effects.push(Blessing(0.5, 5));
   }
 
   draw() {
@@ -308,6 +342,10 @@ class Battle {
       } else {
         console.log(this.player2.name + " fell in battle.");
       }
+
+      this.effects.forEach(e => e.tick());
+      WeatherQueue.forEach(e => e([this.player1, this.player2]));
+      WeatherQueue = [];
 
       console.log(this.player1.name + ": " + this.player1.hitPoints + " HP");
       console.log(this.player2.name + ": " + this.player2.hitPoints + " HP");
