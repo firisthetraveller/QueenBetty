@@ -1,3 +1,5 @@
+const CARDS_AT_TURN_START = 4;
+
 const getNextProbabilities = (matrix, current) => {
   return matrix[current]
 }
@@ -15,8 +17,18 @@ const getRandomInWeightedArray = (array) => {
   return i;
 }
 
+const CharacterTextures = (win, loss, idle, attack, hurt) => {
+  return {
+    win: win,
+    loss: loss,
+    idle: idle,
+    attack: attack,
+    hurt: hurt
+  }
+};
+
 class Character {
-  constructor(name, position, hp = 100) {
+  constructor(name, position, textures, hp = 100) {
     this.name = name;
     this.position = position;
     this.hitPoints = hp;
@@ -69,6 +81,11 @@ class Character {
   }
 }
 
+const ThinGuy = () => {
+  return
+};
+
+
 const UniformStrategy = (character) => {
   character.drawCard();
 }
@@ -78,6 +95,12 @@ const MarkovStrategy = (character, matrix) => {
 }
 
 class Card {
+  /**
+   * 
+   * @param {String} name 
+   * @param {String} description 
+   * @param {Function} effect (target) => void. A function that applies on the target.
+   */
   constructor(name, description, effect) {
     this.name = name;
     this.description = description;
@@ -170,15 +193,78 @@ class Deck {
 
   draw() {
     if (this.cards.length > 0) {
-      return this.cards[int(Math.random() * this.cards.length)]
+      let card = this.cards[int(Math.random() * this.cards.length)];
+      // this.removeCard(card);
+      return card;
     }
   }
-}
+
+  removeCard(card) {
+    const index = this.cards.indexOf(card);
+    if (index > -1) { // only splice array when item is found
+      this.cards.splice(index, 1); // 2nd parameter means remove one item only
+    }
+  }
+
+  /**
+   * 
+   * @param {Card} card 
+   */
+  remove(card) {
+    this.cards.remove(card);
+  }
+
+  /**
+   * 
+   * @param {Hand} hand 
+   */
+  put(hand) {
+    hand.cards.forEach(card => this.cards.push(card));
+  }
+};
+
+class Hand {
+  constructor() {
+    this.cards = [];
+  }
+
+  /**
+   * 
+   * @param {Deck} from 
+   */
+  drawFirstTurn(from) {
+    while (this.cards.length < CARDS_AT_TURN_START) {
+      let card = from.draw();
+      this.cards.push(card);
+    }
+  }
+
+  clear(deck) {
+    deck.put(this);
+    this.cards = [];
+  }
+};
+
+class Weather {
+  constructor(parameter, effect) {
+    this.parameter = parameter;
+    this.effect = effect;
+  }
+
+  occur() {
+    this.effect();
+  }
+};
+
+const Catastrophe = (param, damage) => {
+  return new Weather(param, (target1, target2) => { target1.takeHit(damage); target2.takeHit(damage); });
+};
 
 class Battle {
   constructor() {
     this.player1 = new Character("Player", { x: 30, y: 200 });
     this.player2 = new Character("Bad Guy", { x: 360, y: 200 });
+    this.effects = [];
   }
 
   setup() {
@@ -187,11 +273,13 @@ class Battle {
     this.player1.addCard(DiceCard(3));
 
     this.player2.addCard(UniformCard(10, 2));
+
+    this.effects.push(Catastrophe())
   }
 
   draw() {
-    this.player1.draw();
-    this.player2.draw();
+    //this.player1.draw();
+    //this.player2.draw();
   }
 
   update() {
@@ -215,8 +303,9 @@ class Battle {
 let battle = new Battle();
 
 function setup() {
-  createCanvas(400, 400);
+  //createCanvas(400, 400);
   battle.setup();
+  console.log("Setup: OK");
 }
 
 function draw() {
