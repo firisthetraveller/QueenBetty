@@ -9,6 +9,8 @@ Ici, les effets de cartes (sauf une, l'attaque de base) auront un effet basé su
 - Une loi par carte :
   - Bernoulli : Un lancer de pièce décide du résultat de l'attaque.
   - géométrique : L'attaque continue jusqu'à qu'une rate
+- Des effets aléatoires :
+  - Catastrophe / Bénédiction : A des moments aléatoires (dont le temps d'attente suit une loi exponentielle), ces événements peuvent se déclencher et affecter les différents personnages.
 
 On ajoutera à cette description les lois utilisées quand on les aura apprises.
 
