@@ -89,25 +89,42 @@ h1 {
     background-size: cover;
     height: 500px;
     display: flex;
-    flex-direction: row;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: center;
     justify-content: space-evenly;
     /* J'ai rajouté ça pour que l'image arrête de trop bouger */
     background-position: center;
 }
 
+.history{
+    background-color: white;
+    height: 100px;
+    width:600px;
+    margin-top: 30px;
+    margin-bottom: -100px;
+    border-radius: 10px;
+}
+
+.war{
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-around;
+    margin-top: -100px;
+
+}
 .player {
     height: 280px;
     width: 180px;
     margin-top: 220px;
-    /* margin-left: 250px; */
+    margin-left: -300px;
 }
 
 .pc {
     height: 300px;
     width: 200px;
     /* /* margin-top:210px; */
-    /* margin-right: 320px; */
+    margin-left: 300px;
 }
 
 
@@ -136,6 +153,8 @@ h1 {
     background-color: pink;
     margin: 10px;
     filter: brightness(90%);
+    border-radius: 10px;
+
 
 }
 
