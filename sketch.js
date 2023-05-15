@@ -28,10 +28,18 @@ const CharacterTextures = (win, loss, idle, attack, hurt) => {
 };
 
 class Character {
+  /**
+   * 
+   * @param {String} name 
+   * @param {vec2} position 
+   * @param {CharacterTextures} textures 
+   * @param {Number} hp 
+   */
   constructor(name, position, textures, hp = 100) {
     this.name = name;
     this.position = position;
     this.hitPoints = hp;
+    this.textures = textures;
     this.deck = new Deck();
   }
 
@@ -99,12 +107,18 @@ class Card {
    * 
    * @param {String} name 
    * @param {String} description 
+   * @param {Image} texture
    * @param {Function} effect (target) => void. A function that applies on the target.
    */
-  constructor(name, description, effect) {
+  constructor(name, description, texture, effect) {
     this.name = name;
     this.description = description;
+    this.texture = texture;
     this.effect = effect;
+  }
+
+  draw = () => {
+    // Draw the card here
   }
 }
 
