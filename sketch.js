@@ -43,7 +43,7 @@ class Character {
     this.deck = new Deck();
   }
 
-  draw = () => {
+  draw() {
     rect(this.position.x, this.position.y, 10);
   };
 
@@ -53,6 +53,7 @@ class Character {
   attack(target) {
     let card = this.drawCard();
     console.log(this.name + " uses " + card.name + "!");
+    console.log(card);
     card.effect(target);
   }
 
@@ -110,14 +111,14 @@ class Card {
    * @param {Image} texture
    * @param {Function} effect (target) => void. A function that applies on the target.
    */
-  constructor(name, description, texture, effect) {
+  constructor(name, description, effect, texture) {
     this.name = name;
     this.description = description;
     this.texture = texture;
     this.effect = effect;
   }
 
-  draw = () => {
+  draw() {
     // Draw the card here
   }
 }
