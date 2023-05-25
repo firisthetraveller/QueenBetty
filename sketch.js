@@ -150,6 +150,12 @@ const MarkovStrategy = (character, matrix) => {
   character.useMarkov(matrix);
 }
 
+let id = 0;
+
+const nextId = () => {
+  return id++;
+}
+
 class Card {
   /**
    * 
@@ -159,6 +165,7 @@ class Card {
    * @param {Function} effect (target) => void. A function that applies on the target.
    */
   constructor(name, description, effect, texture) {
+    this.cardId = nextId();
     this.name = name;
     this.description = description;
     this.texture = texture;
@@ -167,6 +174,11 @@ class Card {
 
   draw() {
     // Draw the card here
+    return (
+      `<div class="card" id="card-${nextId}">
+        <p>${this.description}</p>
+      </div>`
+    );
   }
 }
 
@@ -185,7 +197,7 @@ const BaseAttackCard = (damage) => {
  * @param {Number} damage The damage dealt on each hit
  */
 const BernouilliCard = (parameter, damage) => {
-  return new Card("Heads or tails", "A strong attack. Accuracy: " + (parameter * 100) + "%", (target) => {
+  return new Card("Heads or tails", "A strong attack. Damage: " + damage + ". Accuracy: " + (parameter * 100) + "%", (target) => {
     if (Math.random() > parameter) {
       console.log("Lucky! A strong hit landed!");
       target.takeHit(damage);
@@ -282,6 +294,10 @@ class Deck {
    */
   put(hand) {
     hand.cards.forEach(card => this.cards.push(card));
+  }
+
+  draw() {
+    document.getElementById("cards_zone").innerHTML = this.cards.map(card => card.draw()).join("<br>");
   }
 };
 
