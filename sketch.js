@@ -86,6 +86,7 @@ class Character {
      */
     attack(target) {
         let card = this.drawCard();
+
         console.log(this.name + " uses " + card.name + "!");
         console.log(card);
         card.effect(target);
