@@ -17,7 +17,13 @@ const getRandomInWeightedArray = (array) => {
   return i;
 }
 
+/**
+ * All of the textures needed for a character.
+ * The five parameters are the five different animation states.
+ * @returns an object with all the paths
+ */
 const CharacterTextures = (win, loss, idle, attack, hurt) => {
+  // Est-ce qu'on charge les images ici ?
   return {
     win: win,
     loss: loss,
@@ -26,6 +32,34 @@ const CharacterTextures = (win, loss, idle, attack, hurt) => {
     hurt: hurt
   }
 };
+
+const cacahueteTextures = CharacterTextures(
+  "img/Cacahuete_a_gagne.svg",
+  "img/Cacahuete_a_perdu.svg",
+  "img/Cacahuete_en_attente.svg",
+  "img/Cacahuete_attaque.svg",
+  "img/Cacahuete_se_fait_attaquer.svg");
+
+const orangeTextures = CharacterTextures(
+  "img/Orange_a_gagne.svg",
+  "img/Orange_a_perdu.svg",
+  "img/Orange_en_attente.svg",
+  "img/Orange_attaque.svg",
+  "img/Orange_se_fait_attaquer.svg");
+
+const rougeTextures = CharacterTextures(
+  "img/Rouge_a_gagne.svg",
+  "img/Rouge_a_perdu.svg",
+  "img/Rouge_en_attente.svg",
+  "img/Rouge_attaque.svg",
+  "img/Rouge_se_fait_attaquer.svg");
+
+const vertTextures = CharacterTextures(
+  "img/Vert_a_gagne.svg",
+  "img/Vert_a_perdu.svg",
+  "img/Vert_en_attente.svg",
+  "img/Vert_attaque.svg",
+  "img/Vert_se_fait_attaquer.svg");
 
 class Character {
   /**
@@ -92,10 +126,21 @@ class Character {
   }
 }
 
-const ThinGuy = () => {
-  return
+const OrangeCharacter = (name, position) => {
+  return Character(name, position, orangeTextures);
 };
 
+const CacahueteCharacter = (name, position) => {
+  return Character(name, position, cacahueteTextures);
+};
+
+const VertCharacter = (name, position) => {
+  return Character(name, position, vertTextures);
+};
+
+const RougeCharacter = (name, position) => {
+  return Character(name, position, rougeTextures);
+};
 
 const UniformStrategy = (character) => {
   character.drawCard();

@@ -41,7 +41,7 @@
                     <img src="img/Vert_en_attente.svg" alt="">
                 </div>
             </div>
-           
+
         </section>
         <section class="cards_zone">
             <div class="card"></div>
@@ -95,25 +95,27 @@
         const closeButton = document.querySelectorAll('.close-button');
         let activeModal = null;
 
-        modalButtonRules.addEventListener('click', function(event) {
+        modalButtonRules.addEventListener('click', function (event) {
             event.preventDefault();
             modalRules.classList.add('active');
             activeModal = modalRules;
         });
 
-        modalButtonCommandes.addEventListener('click', function(event) {
+        modalButtonCommandes.addEventListener('click', function (event) {
             event.preventDefault();
             modalCommandes.classList.add('active');
             activeModal = modalCommandes;
         });
 
         for (let i = 0; i < closeButton.length; i++) {
-            closeButton[i].addEventListener('click', function() {
+            closeButton[i].addEventListener('click', function () {
                 activeModal.classList.remove('active');
                 activeModal = null;
             });
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
+    <script src="./sketch.js"></script>
 </body>
 
 </html>
