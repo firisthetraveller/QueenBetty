@@ -1,6 +1,33 @@
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const exp = (n, lambda) => 1 - Math.exp(-lambda * n);
+const expInv = (rand, lambda) => {
+    let i = 0;
+    while (exp(i, lambda) < rand) {
+        i++;
+    }
+    return i;
+}
+
+function beta(alpha, beta) {
+    const u = Math.random();
+    const v = Math.random();
+
+    const x = Math.pow(u, 1 / alpha);
+    const y = Math.pow(v, 1 / beta);
+    return x / (x + y);
+}
+
+function stringToBeta(s, a, b) {
+    let characters = s.split("");
+    return characters.map(c => {
+        let rand = beta(a, b);
+        // original font-size: 14
+
+        return `<span style="font-size: ${Math.floor(rand * 14) + 1}px">${c}</span>`;
+    }).join("");
+}
 
 const CARDS_AT_TURN_START = 4;
+const HP_MAX = 1000;
 
 const getNextProbabilities = (matrix, current) => {
     return matrix[current]
@@ -136,7 +163,7 @@ class Character {
      * @param {CharacterTextures} textures 
      * @param {Number} hp 
      */
-    constructor(name, position, textures, hp = 1000) {
+    constructor(name, position, textures, hp = HP_MAX) {
         this.name = name;
         this.position = position;
         this.hitPoints = hp;
@@ -150,9 +177,18 @@ class Character {
 
         console.log("Animation state: " + this.animationState);
         console.log("Available textures: " + this.textures);
-        console.log("Image path: " + this.textures[this.animationState]);
+        console.log("Image path: " + this.texture[this.animationState]);
         console.log("");
         document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="">`;
+    }
+
+    showEnd() {
+        this.animationState = (this.isAlive()) ? AnimationState.win : AnimationState.loss;
+    }
+
+    drawLife() {
+        let id = ((this.position === Position.left) ? "p1_life" : "p2_life");
+        document.getElementById(id).innerHTML = `${Math.max(0, this.hitPoints)} / ${HP_MAX}`;
     }
 
     /**
@@ -257,7 +293,7 @@ class Card {
         return (
             `<div class="card" id="card-${this.cardId}">
                 <h3>${this.name}</h3>
-                <p>${this.description}</p>
+                <p>${stringToBeta(this.description, 0.5, 0.5)}</p>
             </div>`
         );
     }
@@ -373,15 +409,6 @@ class Deck {
 
 let WeatherQueue = [];
 
-const exp = (n, lambda) => 1 - Math.exp(-lambda * n);
-const expInv = (rand, lambda) => {
-    let i = 0;
-    while (exp(i, lambda) < rand) {
-        i++;
-    }
-    return i;
-}
-
 class Weather {
     constructor(parameter, effect) {
         this.parameter = parameter;
@@ -436,51 +463,45 @@ class Battle {
 
         this.effects.push(Catastrophe(0.3, 9));
         this.effects.push(Blessing(0.5, 5));
+
+        this.players[0].deck.draw();
     }
 
     isOver() {
         return !(this.players[0].isAlive() && this.players[1].isAlive());
     }
 
-    async drawPlayers() {
-        this.players.forEach(p => p.draw());
-        await sleep(4000);
-
+    showWinner() {
+        this.players.forEach(p => p.showEnd());
+        this.drawPlayers();
     }
 
-    draw() {
-        this.players[0].deck.draw();
+    displayLife() {
+        this.players.forEach(p => p.drawLife());
+    }
+
+    drawPlayers() {
+        this.players.forEach(p => p.draw());
     }
 
     async update() {
         if (this.players[0].isAlive() && this.players[1].isAlive()) {
             this.players[0].attack(this.players[1]);
-
             this.drawPlayers();
             this.players.forEach(p => p.resetAnimationState());
 
-            if (this.players[1].isAlive()) {
-                await sleep(4000);
-                this.players[1].attack(this.players[0]);
-                if (!this.players[0].isAlive()) {
-                    console.log("Oh no, you're dead. Refresh the page to retry.");
-                    document.getElementById('history').innerHTML = "Oh no, you're dead. Refresh the page to retry.";
-                    this.players[1].animationState = AnimationState.win;
-                    this.players[0].animationState = AnimationState.loss;
-                    console.log("Image path fin: " + this.players[1].textures[this.players[1].animationState]);
-                    this.drawPlayers();
-
-                } else {
-
-                }
-            } else {
-                console.log(this.players[1].name + " fell in battle.");
+            if (!this.players[1].isAlive()) {
                 document.getElementById('history').innerHTML = "Yaaaaay, you won! Refresh the page to retry.";
-                this.players[0].animationState = AnimationState.win;
-                this.players[1].animationState = AnimationState.loss;
-                console.log("Image path fin: " + this.players[0].textures[this.players[0].animationState]);
-                this.drawPlayers();
+                return;
             }
+
+            this.players[1].attack(this.players[0]);
+            this.drawPlayers();
+
+            if (!this.players[0].isAlive()) {
+                return;
+            }
+
 
             this.effects.forEach(e => e.tick());
             WeatherQueue.forEach(e => e(this.players));
@@ -488,6 +509,8 @@ class Battle {
 
             console.log(this.players[0].name + ": " + this.players[0].hitPoints + " HP");
             console.log(this.players[1].name + ": " + this.players[1].hitPoints + " HP");
+
+            this.displayLife();
         }
     }
 }
@@ -498,8 +521,10 @@ battle.setup();
 console.log("Setup: OK");
 
 while (!battle.isOver()) {
-    battle.draw();
     battle.update();
 }
+
+battle.displayLife();
+battle.showWinner();
 
 stats.print();
