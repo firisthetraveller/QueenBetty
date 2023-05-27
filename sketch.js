@@ -76,6 +76,58 @@ const Position = {
     left: "left"
 }
 
+function getAverage(values) {
+    return values.reduce((res, a) => res + a, 0) / values.length;
+}
+
+function getSquaredAverage(values) {
+    return values.reduce((res, a) => res + a * a, 0) / values.length;
+}
+
+function getVariance(values) {
+    let average = getAverage(values);
+    return getSquaredAverage(values) - average * average;
+}
+
+class Stats {
+    constructor() {
+        this.counts = {}
+    }
+
+    /**
+     * 
+     * @param {String} key 
+     */
+    addStat(key) {
+        this.counts[key] = [];
+    }
+
+    /**
+     * 
+     * @param {String} key 
+     * @param {Number} result
+     */
+    addTry(key, result) {
+        if (this.counts[key] === undefined) {
+            this.addStat(key);
+        }
+
+        this.counts[key].push(result);
+    }
+
+    print() {
+        console.log("Stats:");
+
+        Object.keys(this.counts).forEach(key => {
+            console.log(key + " - For " + this.counts[key].length + " tries:");
+            console.log("Average: " + getAverage(this.counts[key]));
+            console.log("Variance: " + getVariance(this.counts[key]));
+        });
+    }
+};
+
+let stats = new Stats();
+
 class Character {
     /**
      * 
@@ -84,7 +136,7 @@ class Character {
      * @param {CharacterTextures} textures 
      * @param {Number} hp 
      */
-    constructor(name, position, texture, hp = 100) {
+    constructor(name, position, texture, hp = 1000) {
         this.name = name;
         this.position = position;
         this.hitPoints = hp;
@@ -228,8 +280,9 @@ const BernouilliCard = (parameter, damage) => {
         if (Math.random() > parameter) {
             console.log("Lucky! A strong hit landed!");
             target.takeHit(damage);
+            stats.addTry("Bernouilli" + parameter, 1);
         } else {
-            let rand = int(Math.random() * 3);
+            let rand = Math.floor(Math.random() * 3);
             switch (rand) {
                 case 0:
                     console.log("Shucks! You slipped on a banana! The attack missed.");
@@ -241,15 +294,17 @@ const BernouilliCard = (parameter, damage) => {
                     console.log("The enemy swiftly dodged the attack. The attack missed.");
                     break;
             }
+            stats.addTry("Bernouilli" + parameter, 0);
         }
     });
 };
 
 const UniformCard = (maxRoll, damage) => {
     return new Card("Uniform card", "An attack for gamblers. Accuracy: 100%. Damage: #diceroll * " + damage, (target) => {
-        let roll = int(Math.random() * maxRoll) + 1;
+        let roll = Math.floor(Math.random() * maxRoll) + 1;
         console.log("A '" + roll + "' has been rolled.");
         target.takeHit(roll * damage);
+        stats.addTry("Uniform" + maxRoll, roll);
     });
 };
 
@@ -289,6 +344,7 @@ const GeometricCard = (parameter, damage) => {
                     console.log(target.name + " dodged the last one.");
             }
         }
+        stats.addTry("Geometric" + parameter, i);
 
         if (i > 1) {
             console.log(target.name + " took a total of " + damage * i + " damage.");
@@ -303,7 +359,7 @@ class Deck {
 
     drawCard() {
         if (this.cards.length > 0) {
-            let card = this.cards[int(Math.random() * this.cards.length)];
+            let card = this.cards[Math.floor(Math.random() * this.cards.length)];
             return card;
         }
     }
@@ -333,6 +389,7 @@ class Weather {
 
     arm() {
         this.countdown = expInv(Math.random(), this.parameter);
+        stats.addTry("Exponential" + this.parameter, this.countdown);
     }
 
     tick() {
@@ -377,6 +434,10 @@ class Battle {
         this.effects.push(Blessing(0.5, 5));
     }
 
+    isOver() {
+        return !(this.players[0].isAlive() && this.players[1].isAlive());
+    }
+
     async drawPlayers() {
         this.players.forEach(p => p.draw());
         await sleep(1000);
@@ -399,7 +460,6 @@ class Battle {
                 if (!this.players[0].isAlive()) {
                     console.log("Oh no, you're dead. Refresh the page to retry.");
                     this.players[1].animationState = AnimationState.win;
-                    console.log("Image path: " + texture[this.animationState]);
                 } else {
 
                 }
@@ -421,15 +481,12 @@ class Battle {
 
 let battle = new Battle();
 
-function setup() {
-    //createCanvas(400, 400);
-    battle.setup();
-    console.log("Setup: OK");
-}
+battle.setup();
+console.log("Setup: OK");
 
-function draw() {
-    background(220);
-
+while (!battle.isOver()) {
     battle.draw();
     battle.update();
 }
+
+stats.print();
