@@ -535,16 +535,18 @@ class Blob {
         this.x = Math.floor(Math.random() * window.screen.width);
         this.y = Math.floor(Math.random() * window.screen.height);
         this.radius = Math.floor(radius);
+        this.opacity = 1;
     }
 
     draw() {
-        return `<div class="blob" style="width:${this.radius * 2}px; height: ${this.radius * 2}px; top: ${this.y}px; left: ${this.x}px;"></div>`;
+        return `<div class="blob" style="opacity: ${this.opacity}; width:${this.radius * 2}px; height: ${this.radius * 2}px; top: ${this.y}px; left: ${this.x}px;"></div>`;
     }
 }
 
 class Ink {
     constructor() {
         this.blobs = [];
+        this.delay = 3;
     }
 
     remove(count) {
@@ -554,13 +556,17 @@ class Ink {
     }
 
     tick() {
+        for (let blob of this.blobs) {
+            blob.opacity -= (1 / this.delay).toFixed(1);
+        }
+
         let eventCount = estimationPoisson(6);
         for (let i = 0; i < eventCount; i++) {
             this.blobs.push(new Blob(laplace(20, 5)));
         }
         this.draw();
         // In 3 seconds, remove them
-        setTimeout(() => this.remove(eventCount), 3000);
+        setTimeout(() => this.remove(eventCount), this.delay * 1000);
         setTimeout(() => this.tick(), 1000);
     }
 
