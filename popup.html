@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="popupStyle.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/Cacahuete_a_gagne.svg">
+
+    <title>LA POPUP</title>
+</head>
+<body>
+
+    <div id="modal" class="container">
+
+        <button type="submit" class="btnStat" onclick="openPopup()">VOIR LES STATISTIQUES</button>
+        <div class="popup" id="popup">
+            <img src="img/Cacahuete_en_attente.svg" alt="">
+            <h2>LES STATISTIQUES</h2>
+            <table>
+                <thead>
+                <tr class="titles">
+                    <th>Loi</th>
+                    <th>Paramètre(s)</th>
+                    <th>Espérance Calculée</th>
+                    <th>Variance Calculée</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>loi1</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                </tr>
+                <tr>
+                    <td>loi2</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                </tr>
+                <tr>
+                    <td>loi3</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                </tr>
+                <tr>
+                    <td>loi4</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                </tr>
+                <tr>
+                    <td>loi5</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                </tr>
+                </tbody>
+            </table>
+            <button type="btn-close" onclick="closePopup()">FERMER</button>
+        </div>
+</div>
+
+    <div id="modal">
+        <div class="mask"></div>
+        <div class="container auto">
+            <div class="message"></div>
+            <a href="#" class="close">&times;</a>
+        </div>
+    </div>
+    
+
+    <script>
+        let popup = document.getElementById("popup");
+
+        function openPopup(){
+            popup.classList.add("open-popup");
+        }
+        function closePopup(){
+            popup.classList.remove("open-popup");
+        }
+    </script>
+    
+</body>
+</html>
