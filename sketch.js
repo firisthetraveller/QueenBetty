@@ -28,6 +28,56 @@ function gauss(e, s) {
     return (1 / (s * Math.sqrt(2 * Math.PI))) * Math.exp((-1 / 2) * sq * sq);
 }
 
+/**
+ * https://fr.wikipedia.org/wiki/Loi_de_Laplace_(probabilités)
+ * @param {Number} mu Décalage du pic
+ * @param {Number} b Intensité
+ * @returns 
+ */
+// function laplace(mu, b) {
+//     const x = Math.random();
+//     return (1 / (2 * b)) * Math.exp(-(Math.abs(x - mu)) / b);
+// }
+
+function laplace(mu, b) {
+    const u = Math.random() - 0.5; // Generate a random number between -0.5 and 0.5
+    return -b * Math.sign(u) * Math.log(1 - 2 * Math.abs(u)) + mu;
+}
+
+/**
+ * 
+ * @param {Integer} n 
+ * @returns n!
+ */
+function factorial(n) {
+    if (n < 0) return 0;
+    if (n == 0) return 1;
+    return n * factorial(n - 1);
+}
+
+/**
+ * 
+ * @param {Integer} k 
+ * @param {*} lambda 
+ * @returns 
+ */
+function poisson(k, lambda) {
+    return Math.pow(lambda, k) * Math.exp(- lambda) / factorial(k);
+}
+
+function estimationPoisson(lambda) {
+    const x = Math.random();
+    let cumulative = 0;
+    let k = 0;
+
+    while (cumulative < x) {
+        cumulative += poisson(k, lambda);
+        k++;
+    }
+
+    return k;
+}
+
 function stringToBeta(s, a, b) {
     let characters = s.split("");
     return characters.map(c => {
@@ -187,10 +237,6 @@ class Character {
     draw() {
         let id = ((this.position === Position.left) ? "character1" : "character2");
 
-        console.log("Animation state: " + this.animationState);
-        console.log("Available textures: " + this.textures);
-        console.log("Image path: " + this.textures[this.animationState]);
-        console.log("");
         document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="">`;
     }
 
@@ -456,6 +502,44 @@ const Blessing = (param, value) => {
     });
 };
 
+class Blob {
+    constructor(radius) {
+        this.x = Math.floor(Math.random() * window.screen.width);
+        this.y = Math.floor(Math.random() * window.screen.height);
+        this.radius = Math.floor(radius);
+    }
+
+    draw() {
+        return `<div class="blob" style="width:${this.radius * 2}px; height: ${this.radius * 2}px; top: ${this.y}px; left: ${this.x}px;"></div>`;
+    }
+}
+
+class Ink {
+    constructor() {
+        this.blobs = [];
+    }
+
+    remove(count) {
+        for (let i = 0; i < count; i++) {
+            this.blobs.shift();
+        }
+    }
+
+    tick() {
+        let eventCount = estimationPoisson(6);
+        for (let i = 0; i < eventCount; i++) {
+            this.blobs.push(new Blob(laplace(20, 5)));
+        }
+        this.draw();
+        // In 3 seconds, remove them
+        setTimeout(() => this.remove(eventCount), 3000);
+        setTimeout(() => this.tick(), 1000);
+    }
+
+    draw() {
+        document.getElementById("ink").innerHTML = this.blobs.map(b => b.draw()).join("");
+    }
+}
 
 class Battle {
     constructor() {
@@ -464,6 +548,7 @@ class Battle {
             new Character("Bad Guy", Position.right, vertTextures)
         ];
         this.effects = [];
+        this.ink = new Ink();
     }
 
     setup() {
@@ -477,6 +562,7 @@ class Battle {
         this.effects.push(Blessing(0.5, 5));
 
         this.players[0].deck.draw();
+        this.ink.tick();
     }
 
     isOver() {
@@ -496,34 +582,36 @@ class Battle {
         this.players.forEach(p => p.draw());
     }
 
-    async update() {
-        if (this.players[0].isAlive() && this.players[1].isAlive()) {
-            this.players[0].attack(this.players[1]);
-            this.drawPlayers();
-            this.players.forEach(p => p.resetAnimationState());
-
-            if (!this.players[1].isAlive()) {
-                document.getElementById('history').innerHTML = "Yaaaaay, you won! Refresh the page to retry.";
-                return;
-            }
-
-            this.players[1].attack(this.players[0]);
-            this.drawPlayers();
-
-            if (!this.players[0].isAlive()) {
-                return;
-            }
-
-
-            this.effects.forEach(e => e.tick());
-            WeatherQueue.forEach(e => e(this.players));
-            WeatherQueue = [];
-
-            console.log(this.players[0].name + ": " + this.players[0].hitPoints + " HP");
-            console.log(this.players[1].name + ": " + this.players[1].hitPoints + " HP");
-
-            this.displayLife();
+    update() {
+        if (!this.players[0].isAlive() && this.players[1].isAlive()) {
+            return;
         }
+
+        this.players[0].attack(this.players[1]);
+        this.drawPlayers();
+        this.players.forEach(p => p.resetAnimationState());
+
+        if (!this.players[1].isAlive()) {
+            document.getElementById('history').innerHTML = "Yaaaaay, you won! Refresh the page to retry.";
+            return;
+        }
+
+        this.players[1].attack(this.players[0]);
+        this.drawPlayers();
+
+        if (!this.players[0].isAlive()) {
+            return;
+        }
+
+
+        this.effects.forEach(e => e.tick());
+        WeatherQueue.forEach(e => e(this.players));
+        WeatherQueue = [];
+
+        console.log(this.players[0].name + ": " + this.players[0].hitPoints + " HP");
+        console.log(this.players[1].name + ": " + this.players[1].hitPoints + " HP");
+
+        this.displayLife();
     }
 }
 

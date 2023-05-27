@@ -242,6 +242,20 @@ ul {
     list-style: none;
 }
 
+.absolutegarbage {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 8999;
+}
+
+.blob {
+    border-radius: 50%;
+    background-color: black;
+    position: absolute;
+    z-index: 9000;
+}
+
 .slidersection {
     width: 20%;
     padding: 15px;

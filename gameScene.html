@@ -29,6 +29,9 @@
         </div>
     </header>
     <main>
+        <div id="ink" class="absolutegarbage">
+            <!--auto-completed-->
+        </div>
         <section class="game_zone">
             <div class="history center-text" id="history">
             </div>
@@ -95,20 +98,20 @@
         const closeButton = document.querySelectorAll('.close-button');
         let activeModal = null;
 
-        modalButtonRules.addEventListener('click', function(event) {
+        modalButtonRules.addEventListener('click', function (event) {
             event.preventDefault();
             modalRules.classList.add('active');
             activeModal = modalRules;
         });
 
-        modalButtonCommandes.addEventListener('click', function(event) {
+        modalButtonCommandes.addEventListener('click', function (event) {
             event.preventDefault();
             modalCommandes.classList.add('active');
             activeModal = modalCommandes;
         });
 
         for (let i = 0; i < closeButton.length; i++) {
-            closeButton[i].addEventListener('click', function() {
+            closeButton[i].addEventListener('click', function () {
                 activeModal.classList.remove('active');
                 activeModal = null;
             });
