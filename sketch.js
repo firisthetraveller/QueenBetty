@@ -147,6 +147,7 @@ class Character {
 
     draw() {
         let id = ((this.position === Position.left) ? "character1" : "character2");
+
         console.log("Animation state: " + this.animationState);
         console.log("Available textures: " + this.texture);
         console.log("Image path: " + this.texture[this.animationState]);
@@ -280,7 +281,7 @@ const BernouilliCard = (parameter, damage) => {
         if (Math.random() > parameter) {
             console.log("Lucky! A strong hit landed!");
             target.takeHit(damage);
-            stats.addTry("Bernouilli" + parameter, 1);
+            stats.addTry("Bernouilli: " + parameter, 1);
         } else {
             let rand = Math.floor(Math.random() * 3);
             switch (rand) {
@@ -294,7 +295,7 @@ const BernouilliCard = (parameter, damage) => {
                     console.log("The enemy swiftly dodged the attack. The attack missed.");
                     break;
             }
-            stats.addTry("Bernouilli" + parameter, 0);
+            stats.addTry("Bernouilli: " + parameter, 0);
         }
     });
 };
@@ -304,7 +305,7 @@ const UniformCard = (maxRoll, damage) => {
         let roll = Math.floor(Math.random() * maxRoll) + 1;
         console.log("A '" + roll + "' has been rolled.");
         target.takeHit(roll * damage);
-        stats.addTry("Uniform" + maxRoll, roll);
+        stats.addTry("Uniform: " + maxRoll, roll);
     });
 };
 
@@ -344,7 +345,7 @@ const GeometricCard = (parameter, damage) => {
                     console.log(target.name + " dodged the last one.");
             }
         }
-        stats.addTry("Geometric" + parameter, i);
+        stats.addTry("Geometric: " + parameter, i);
 
         if (i > 1) {
             console.log(target.name + " took a total of " + damage * i + " damage.");
@@ -389,7 +390,7 @@ class Weather {
 
     arm() {
         this.countdown = expInv(Math.random(), this.parameter);
-        stats.addTry("Exponential" + this.parameter, this.countdown);
+        stats.addTry("Exponential: " + this.parameter, this.countdown);
     }
 
     tick() {
@@ -415,11 +416,13 @@ const Blessing = (param, value) => {
     });
 };
 
+
 class Battle {
     constructor() {
         this.players = [
             new Character("Player", Position.left, cacahueteTextures),
-            new Character("Bad Guy", Position.right, vertTextures)];
+            new Character("Bad Guy", Position.right, vertTextures)
+        ];
         this.effects = [];
     }
 
@@ -440,7 +443,7 @@ class Battle {
 
     async drawPlayers() {
         this.players.forEach(p => p.draw());
-        await sleep(1000);
+        await sleep(4000);
     }
 
     draw() {
@@ -452,21 +455,23 @@ class Battle {
             this.players[0].attack(this.players[1]);
 
             this.drawPlayers();
-            this.players.forEach(p => p.resetAnimationState);
+            this.players.forEach(p => p.resetAnimationState());
 
             if (this.players[1].isAlive()) {
+                // await sleep(4000);
                 this.players[1].attack(this.players[0]);
                 this.drawPlayers();
                 if (!this.players[0].isAlive()) {
                     console.log("Oh no, you're dead. Refresh the page to retry.");
                     this.players[1].animationState = AnimationState.win;
+                    console.log("Image path fin: " + texture[this.animationState]);
                 } else {
 
                 }
             } else {
                 console.log(this.players[1].name + " fell in battle.");
                 this.players[0].animationState = AnimationState.win;
-                console.log("Image path: " + texture[this.animationState]);
+                console.log("Image path fin: " + texture[this.animationState]);
             }
 
             this.effects.forEach(e => e.tick());
