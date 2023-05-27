@@ -1,3 +1,5 @@
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 const CARDS_AT_TURN_START = 4;
 
 const getNextProbabilities = (matrix, current) => {
@@ -61,32 +63,50 @@ const vertTextures = CharacterTextures(
     "img/Vert_attaque.svg",
     "img/Vert_se_fait_attaquer.svg");
 
+const AnimationState = {
+    idle: "idle",
+    win: "win",
+    loss: "loss",
+    attack: "attack",
+    hurt: "hurt"
+}
+
+const Position = {
+    right: "right",
+    left: "left"
+}
+
 class Character {
     /**
      * 
      * @param {String} name 
-     * @param {vec2} position 
+     * @param {Position} position 
      * @param {CharacterTextures} textures 
      * @param {Number} hp 
      */
-    constructor(name, position, textures, hp = 100) {
+    constructor(name, position, texture, hp = 100) {
         this.name = name;
         this.position = position;
         this.hitPoints = hp;
-        this.textures = textures;
+        this.texture = texture;
         this.deck = new Deck();
+        this.animationState = AnimationState.idle;
     }
 
     draw() {
-        rect(this.position.x, this.position.y, 10);
-    };
+        let id = ((this.position === Position.left) ? "character1" : "character2");
+        console.log("Animation state: " + this.animationState);
+        console.log("Available textures: " + this.texture);
+        console.log("Image path: " + this.texture[this.animationState]);
+        document.getElementById(id).innerHTML = `<img src="${this.texture[this.animationState]}" alt="">`;
+    }
 
     /**
      * @param {Character} target 
      */
     attack(target) {
         let card = this.drawCard();
-
+        this.animationState = AnimationState.attack;
         console.log(this.name + " uses " + card.name + "!");
         console.log(card);
         card.effect(target);
@@ -103,10 +123,15 @@ class Character {
     takeHit(value) {
         this.hitPoints -= value;
         if (value > 0) {
+            this.animationState = AnimationState.hurt;
             console.log(this.name + " takes " + value + " damage.");
         } else if (value < 0) {
             console.log(this.name + " recovers " + -value + " HP.");
         }
+    }
+
+    resetAnimationState() {
+        this.animationState = AnimationState.idle;
     }
 
     /**
@@ -118,7 +143,7 @@ class Character {
     }
 
     drawCard() {
-        return this.deck.draw();
+        return this.deck.drawCard();
     }
 
     useMarkov(matrix) {
@@ -177,9 +202,9 @@ class Card {
         // Draw the card here
         return (
             `<div class="card" id="card-${this.cardId}">
-      <h3>${this.name}</h3>
-      <p>${this.description}</p>
-    </div>`
+                <h3>${this.name}</h3>
+                <p>${this.description}</p>
+            </div>`
         );
     }
 }
@@ -276,62 +301,15 @@ class Deck {
         this.cards = [];
     }
 
-    draw() {
+    drawCard() {
         if (this.cards.length > 0) {
             let card = this.cards[int(Math.random() * this.cards.length)];
-            // this.removeCard(card);
             return card;
         }
     }
 
-    removeCard(card) {
-        const index = this.cards.indexOf(card);
-        if (index > -1) { // only splice array when item is found
-            this.cards.splice(index, 1); // 2nd parameter means remove one item only
-        }
-    }
-
-    /**
-     * 
-     * @param {Card} card 
-     */
-    remove(card) {
-        this.cards.remove(card);
-    }
-
-    /**
-     * 
-     * @param {Hand} hand 
-     */
-    put(hand) {
-        hand.cards.forEach(card => this.cards.push(card));
-    }
-
     draw() {
         document.getElementById("cards_zone").innerHTML = this.cards.map(card => card.draw()).join("<br>");
-
-    }
-};
-
-class Hand {
-    constructor() {
-        this.cards = [];
-    }
-
-    /**
-     * 
-     * @param {Deck} from 
-     */
-    drawFirstTurn(from) {
-        while (this.cards.length < CARDS_AT_TURN_START) {
-            let card = from.draw();
-            this.cards.push(card);
-        }
-    }
-
-    clear(deck) {
-        deck.put(this);
-        this.cards = [];
     }
 };
 
@@ -382,45 +360,61 @@ const Blessing = (param, value) => {
 
 class Battle {
     constructor() {
-        this.player1 = new Character("Player", { x: 30, y: 200 });
-        this.player2 = new Character("Bad Guy", { x: 360, y: 200 });
+        this.players = [
+            new Character("Player", Position.left, cacahueteTextures),
+            new Character("Bad Guy", Position.right, vertTextures)];
         this.effects = [];
     }
 
     setup() {
-        this.player1.addCard(CoinThrowCard(20));
-        this.player1.addCard(GeometricCard(0.8, 2));
-        this.player1.addCard(DiceCard(3));
+        this.players[0].addCard(CoinThrowCard(20));
+        this.players[0].addCard(GeometricCard(0.8, 2));
+        this.players[0].addCard(DiceCard(3));
 
-        this.player2.addCard(UniformCard(10, 2));
+        this.players[1].addCard(UniformCard(10, 2));
 
         this.effects.push(Catastrophe(0.3, 9));
         this.effects.push(Blessing(0.5, 5));
     }
 
+    async drawPlayers() {
+        this.players.forEach(p => p.draw());
+        await sleep(1000);
+    }
+
     draw() {
-        //this.player1.draw();
-        //this.player2.draw();
+        this.players[0].deck.draw();
     }
 
     update() {
-        if (this.player1.isAlive() && this.player2.isAlive()) {
-            this.player1.attack(this.player2);
-            if (this.player2.isAlive()) {
-                this.player2.attack(this.player1);
-                if (!this.player1.isAlive()) {
+        if (this.players[0].isAlive() && this.players[1].isAlive()) {
+            this.players[0].attack(this.players[1]);
+
+            this.drawPlayers();
+            this.players.forEach(p => p.resetAnimationState);
+
+            if (this.players[1].isAlive()) {
+                this.players[1].attack(this.players[0]);
+                this.drawPlayers();
+                if (!this.players[0].isAlive()) {
                     console.log("Oh no, you're dead. Refresh the page to retry.");
+                    this.players[1].animationState = AnimationState.win;
+                    console.log("Image path: " + texture[this.animationState]);
+                } else {
+
                 }
             } else {
-                console.log(this.player2.name + " fell in battle.");
+                console.log(this.players[1].name + " fell in battle.");
+                this.players[0].animationState = AnimationState.win;
+                console.log("Image path: " + texture[this.animationState]);
             }
 
             this.effects.forEach(e => e.tick());
-            WeatherQueue.forEach(e => e([this.player1, this.player2]));
+            WeatherQueue.forEach(e => e(this.players));
             WeatherQueue = [];
 
-            console.log(this.player1.name + ": " + this.player1.hitPoints + " HP");
-            console.log(this.player2.name + ": " + this.player2.hitPoints + " HP");
+            console.log(this.players[0].name + ": " + this.players[0].hitPoints + " HP");
+            console.log(this.players[1].name + ": " + this.players[1].hitPoints + " HP");
         }
     }
 }
