@@ -39,10 +39,19 @@
                 </div>
             </div>
 
+
         </section>
         <section class="cards_zone" id="cards_zone">
             <!--Les cartes font faire "pouf" ici-->
 
+        </section>
+        <section class="slidersection">
+            <div class="slidecontainer">
+                <p>Gérez vous même les paramètres de lois !</p>
+                <p class="category">Catégorie</p>
+                <label for="myRange">Paramètre :</label>
+                <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+            </div>
         </section>
         <footer>
             <div class="footer_buttons">
@@ -86,20 +95,20 @@
         const closeButton = document.querySelectorAll('.close-button');
         let activeModal = null;
 
-        modalButtonRules.addEventListener('click', function (event) {
+        modalButtonRules.addEventListener('click', function(event) {
             event.preventDefault();
             modalRules.classList.add('active');
             activeModal = modalRules;
         });
 
-        modalButtonCommandes.addEventListener('click', function (event) {
+        modalButtonCommandes.addEventListener('click', function(event) {
             event.preventDefault();
             modalCommandes.classList.add('active');
             activeModal = modalCommandes;
         });
 
         for (let i = 0; i < closeButton.length; i++) {
-            closeButton[i].addEventListener('click', function () {
+            closeButton[i].addEventListener('click', function() {
                 activeModal.classList.remove('active');
                 activeModal = null;
             });
