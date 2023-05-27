@@ -130,9 +130,26 @@ C'est une loi à deux paramètres ($\mu$ et $b$), telle que $\mu$ représente le
 ![Image](https://upload.wikimedia.org/wikipedia/commons/8/89/Laplace_distribution_pdf.png)
 Source : Wikipédia, [loi de Laplace](https://fr.wikipedia.org/wiki/Loi_de_Laplace_(probabilités))
 
-Cela revient à avoir une probabilité très forte d'avoir des nombres proches de $\mu$.
+Cela revient à avoir une probabilité très forte d'avoir des nombres proches de $\mu$, mais qui s'étalent quand b est grand.
+
+| Espérance | Variance |
+| --------- | -------- |
+| $\mu$     | $2b^2$   |
 
 ### Loi bêta
-La loi bêta 
+La loi bêta est une loi à distribution continue, avec diverses fonctions de densité.
 
-### Loi normale de Gauss
+![Fonctions de densité](https://upload.wikimedia.org/wikipedia/commons/9/9a/Beta_distribution_pdf.png)
+
+Nous avons ici choisi de l'appliquer sur la taille des caractères lors de l'affichage des cartes, avec la taille des caractères suivant une loi bêta de paramètres $\alpha = 0.5$ et $\beta = 0.5$. 
+
+Cela représente d'après le graphique ci-dessus un nombre important de caractères ayant une taille proche de 0 et de la taille maximale donnée.
+
+![Exemple dans le jeu](img/screenshots/loi_beta_texte.png)
+*Exemple d'application, on voit bien beaucoup de lettres de taille normale (les grandes), on voit surtout les lettres très petites, et peu de lettres intermédiaires.*
+
+| Espérance                       | Variance                                                      |
+| ------------------------------- | ------------------------------------------------------------- |
+| $\frac{\alpha}{\alpha + \beta}$ | $\frac{\alpha \beta}{(\alpha + \beta)^2(\alpha + \beta + 1)}$ |
+
+<!--### Loi normale de Gauss-->
