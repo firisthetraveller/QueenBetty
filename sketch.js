@@ -464,6 +464,7 @@ class Battle {
                 this.players[1].attack(this.players[0]);
                 if (!this.players[0].isAlive()) {
                     console.log("Oh no, you're dead. Refresh the page to retry.");
+                    document.getElementById('history').innerHTML = "Oh no, you're dead. Refresh the page to retry.";
                     this.players[1].animationState = AnimationState.win;
                     this.players[0].animationState = AnimationState.loss;
                     console.log("Image path fin: " + this.players[1].textures[this.players[1].animationState]);
@@ -474,6 +475,7 @@ class Battle {
                 }
             } else {
                 console.log(this.players[1].name + " fell in battle.");
+                document.getElementById('history').innerHTML = "Yaaaaay, you won! Refresh the page to retry.";
                 this.players[0].animationState = AnimationState.win;
                 this.players[1].animationState = AnimationState.loss;
                 console.log("Image path fin: " + this.players[0].textures[this.players[0].animationState]);

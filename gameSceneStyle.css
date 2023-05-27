@@ -105,6 +105,13 @@ h1 {
     border-radius: 10px;
 }
 
+.center-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
 .war {
     display: flex;
     flex-direction: row;
