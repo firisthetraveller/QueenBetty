@@ -1,3 +1,7 @@
+import stats from "./components/Stats.js";
+import { Card, Deck, UniformCard, CoinThrowCard, DiceCard, GeometricCard } from "./components/Card.js";
+import { Catastrophe, Blessing, weatherEffects } from "./components/Weather.js";
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const CARDS_AT_TURN_START = 4;
@@ -76,58 +80,6 @@ const Position = {
     left: "left"
 }
 
-function getAverage(values) {
-    return values.reduce((res, a) => res + a, 0) / values.length;
-}
-
-function getSquaredAverage(values) {
-    return values.reduce((res, a) => res + a * a, 0) / values.length;
-}
-
-function getVariance(values) {
-    let average = getAverage(values);
-    return getSquaredAverage(values) - average * average;
-}
-
-class Stats {
-    constructor() {
-        this.counts = {}
-    }
-
-    /**
-     * 
-     * @param {String} key 
-     */
-    addStat(key) {
-        this.counts[key] = [];
-    }
-
-    /**
-     * 
-     * @param {String} key 
-     * @param {Number} result
-     */
-    addTry(key, result) {
-        if (this.counts[key] === undefined) {
-            this.addStat(key);
-        }
-
-        this.counts[key].push(result);
-    }
-
-    print() {
-        console.log("Stats:");
-
-        Object.keys(this.counts).forEach(key => {
-            console.log(key + " - For " + this.counts[key].length + " tries:");
-            console.log("Average: " + getAverage(this.counts[key]));
-            console.log("Variance: " + getVariance(this.counts[key]));
-        });
-    }
-};
-
-let stats = new Stats();
-
 class Character {
     /**
      * 
@@ -147,9 +99,6 @@ class Character {
 
     draw() {
         let id = ((this.position === Position.left) ? "character1" : "character2");
-        console.log("Animation state: " + this.animationState);
-        console.log("Available textures: " + this.texture);
-        console.log("Image path: " + this.texture[this.animationState]);
         document.getElementById(id).innerHTML = `<img src="${this.texture[this.animationState]}" alt="">`;
     }
 
@@ -160,7 +109,6 @@ class Character {
         let card = this.drawCard();
         this.animationState = AnimationState.attack;
         console.log(this.name + " uses " + card.name + "!");
-        console.log(card);
         card.effect(target);
     }
 
@@ -228,193 +176,6 @@ const MarkovStrategy = (character, matrix) => {
     character.useMarkov(matrix);
 }
 
-let id = 0;
-
-const nextId = () => {
-    return id++;
-}
-
-class Card {
-    /**
-     * 
-     * @param {String} name 
-     * @param {String} description 
-     * @param {Image} texture
-     * @param {Function} effect (target) => void. A function that applies on the target.
-     */
-    constructor(name, description, effect, texture) {
-        this.cardId = nextId();
-        this.name = name;
-        this.description = description;
-        this.texture = texture;
-        this.effect = effect;
-    }
-
-    draw() {
-        // Draw the card here
-        return (
-            `<div class="card" id="card-${this.cardId}">
-                <h3>${this.name}</h3>
-                <p>${this.description}</p>
-            </div>`
-        );
-    }
-}
-
-/**
- * 
- * @param {Number} damage 
- * @returns 
- */
-const BaseAttackCard = (damage) => {
-    return new Card("Base attack", "A simple attack.", (target) => target.takeHit(damage));
-}
-
-/**
- * 
- * @param {Number} parameter The probability of success for each hit
- * @param {Number} damage The damage dealt on each hit
- */
-const BernouilliCard = (parameter, damage) => {
-    return new Card("Heads or tails", "A strong attack. Damage: " + damage + ". Accuracy: " + (parameter * 100) + "%", (target) => {
-        if (Math.random() > parameter) {
-            console.log("Lucky! A strong hit landed!");
-            target.takeHit(damage);
-            stats.addTry("Bernouilli" + parameter, 1);
-        } else {
-            let rand = Math.floor(Math.random() * 3);
-            switch (rand) {
-                case 0:
-                    console.log("Shucks! You slipped on a banana! The attack missed.");
-                    break;
-                case 1:
-                    console.log("You had an urge to sneeze! A-A-Achoo! The attack missed.");
-                    break;
-                case 2:
-                    console.log("The enemy swiftly dodged the attack. The attack missed.");
-                    break;
-            }
-            stats.addTry("Bernouilli" + parameter, 0);
-        }
-    });
-};
-
-const UniformCard = (maxRoll, damage) => {
-    return new Card("Uniform card", "An attack for gamblers. Accuracy: 100%. Damage: #diceroll * " + damage, (target) => {
-        let roll = Math.floor(Math.random() * maxRoll) + 1;
-        console.log("A '" + roll + "' has been rolled.");
-        target.takeHit(roll * damage);
-        stats.addTry("Uniform" + maxRoll, roll);
-    });
-};
-
-const DiceCard = (damage) => {
-    return UniformCard(6, damage);
-}
-
-/**
- * 
- * @param {Number} damage The damage dealt on each hit
- */
-const CoinThrowCard = (damage) => {
-    return BernouilliCard(0.5, damage);
-}
-
-/**
- * 
- * @param {Number} parameter The probability of success for each hit
- * @param {Number} damage The damage dealt on each hit
- */
-const GeometricCard = (parameter, damage) => {
-    return new Card("Geometric card", "A flurry of attacks, ending when an attack misses. Accuracy: " + (parameter * 100) + "%", (target) => {
-        let i = 0;
-        while (Math.random() > (1 - parameter)) {
-            target.takeHit(damage);
-            i++;
-        }
-        if (target.isAlive()) {
-            switch (i) {
-                case 0:
-                    console.log(target.name + " was ready for it and dodged the attack.");
-                    break;
-                case 1:
-                    console.log(target.name + " SDI'd so hard that he is already out of range.");
-                    break;
-                default:
-                    console.log(target.name + " dodged the last one.");
-            }
-        }
-        stats.addTry("Geometric" + parameter, i);
-
-        if (i > 1) {
-            console.log(target.name + " took a total of " + damage * i + " damage.");
-        }
-    });
-}
-
-class Deck {
-    constructor() {
-        this.cards = [];
-    }
-
-    drawCard() {
-        if (this.cards.length > 0) {
-            let card = this.cards[Math.floor(Math.random() * this.cards.length)];
-            return card;
-        }
-    }
-
-    draw() {
-        document.getElementById("cards_zone").innerHTML = this.cards.map(card => card.draw()).join("<br>");
-    }
-};
-
-let WeatherQueue = [];
-
-const exp = (n, lambda) => 1 - Math.exp(-lambda * n);
-const expInv = (rand, lambda) => {
-    let i = 0;
-    while (exp(i, lambda) < rand) {
-        i++;
-    }
-    return i;
-}
-
-class Weather {
-    constructor(parameter, effect) {
-        this.parameter = parameter;
-        this.effect = effect;
-        this.arm();
-    }
-
-    arm() {
-        this.countdown = expInv(Math.random(), this.parameter);
-        stats.addTry("Exponential" + this.parameter, this.countdown);
-    }
-
-    tick() {
-        this.countdown--;
-        if (this.countdown == 0) {
-            WeatherQueue.push(this.effect);
-            this.arm();
-        }
-    }
-};
-
-const Catastrophe = (param, value) => {
-    return new Weather(param, (targets) => {
-        console.error("A catastrophe occurred!");
-        targets.forEach(t => t.takeHit(value));
-    });
-};
-
-const Blessing = (param, value) => {
-    return new Weather(param, (targets) => {
-        console.error("A soothing breeze is gently caressing both players.");
-        targets.forEach(t => t.takeHit(-value));
-    });
-};
-
 class Battle {
     constructor() {
         this.players = [
@@ -466,12 +227,10 @@ class Battle {
             } else {
                 console.log(this.players[1].name + " fell in battle.");
                 this.players[0].animationState = AnimationState.win;
-                console.log("Image path: " + texture[this.animationState]);
             }
 
             this.effects.forEach(e => e.tick());
-            WeatherQueue.forEach(e => e(this.players));
-            WeatherQueue = [];
+            weatherEffects.trigger(this.players);
 
             console.log(this.players[0].name + ": " + this.players[0].hitPoints + " HP");
             console.log(this.players[1].name + ": " + this.players[1].hitPoints + " HP");
