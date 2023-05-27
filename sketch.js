@@ -16,6 +16,18 @@ function beta(alpha, beta) {
     return x / (x + y);
 }
 
+/**
+ * 
+ * @param {Number} e espérance
+ * @param {Number} s écart-type
+ * @returns 
+ */
+function gauss(e, s) {
+    const x = Math.random();
+    const sq = (x - s) / e;
+    return (1 / (s * Math.sqrt(2 * Math.PI))) * Math.exp((-1 / 2) * sq * sq);
+}
+
 function stringToBeta(s, a, b) {
     let characters = s.split("");
     return characters.map(c => {
