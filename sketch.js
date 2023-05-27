@@ -404,6 +404,34 @@ const UniformCard = (maxRoll, damage) => {
     });
 };
 
+/**
+ * Named after Bullet Seed, an attack from Pokémon.
+ * It repeats 2-5 times the same attack, according to a custom distribution.
+ * @param {Array<Number>} parameters an array of values which total sum 
+ * @param {Number} damage 
+ */
+const BulletCard = (parameters, damage) => {
+    let check = parameters.reduce((a, b) => a + b, 0);
+    if (check != 1) {
+        console.error("Bullet card doesn't have a correct sum of probabilities: " + check);
+        throw "Illegal argument exception.";
+    }
+
+    return new Card("Bullet card", "Throw seeds at the opponent. It is guaranteed to hit but the probability to deal more damage is low. Damage: #Hits * " + damage, (target) => {
+        let roll = Math.random();
+        let hitCount = 0;
+        let cumulative = 0;
+
+        while (cumulative < roll) {
+            cumulative += parameters[hitCount];
+            hitCount++;
+            target.takeHit(damage);
+        }
+        console.log(`Hit ${hitCount} times!`);
+        stats.addTry("Bullet: " + parameters, hitCount);
+    });
+}
+
 const DiceCard = (damage) => {
     return UniformCard(6, damage);
 }
@@ -555,6 +583,7 @@ class Battle {
         this.players[0].addCard(CoinThrowCard(20));
         this.players[0].addCard(GeometricCard(0.8, 2));
         this.players[0].addCard(DiceCard(3));
+        this.players[0].addCard(BulletCard([0, 0.375, 0.375, 0.125, 0.125], 4));
 
         this.players[1].addCard(UniformCard(10, 2));
 
