@@ -177,7 +177,7 @@ class Character {
 
         console.log("Animation state: " + this.animationState);
         console.log("Available textures: " + this.textures);
-        console.log("Image path: " + this.texture[this.animationState]);
+        console.log("Image path: " + this.textures[this.animationState]);
         console.log("");
         document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="">`;
     }
