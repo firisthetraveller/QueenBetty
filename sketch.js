@@ -151,6 +151,7 @@ class Character {
         console.log("Animation state: " + this.animationState);
         console.log("Available textures: " + this.textures);
         console.log("Image path: " + this.textures[this.animationState]);
+        console.log("");
         document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="">`;
     }
 
@@ -443,14 +444,15 @@ class Battle {
 
     async drawPlayers() {
         this.players.forEach(p => p.draw());
-        await sleep(1000);
+        await sleep(4000);
+
     }
 
     draw() {
         this.players[0].deck.draw();
     }
 
-    update() {
+    async update() {
         if (this.players[0].isAlive() && this.players[1].isAlive()) {
             this.players[0].attack(this.players[1]);
 
@@ -458,14 +460,14 @@ class Battle {
             this.players.forEach(p => p.resetAnimationState());
 
             if (this.players[1].isAlive()) {
-                // await sleep(4000);
+                await sleep(4000);
                 this.players[1].attack(this.players[0]);
-                this.drawPlayers();
                 if (!this.players[0].isAlive()) {
                     console.log("Oh no, you're dead. Refresh the page to retry.");
                     this.players[1].animationState = AnimationState.win;
-                    // console.log("Image path fin: " + texture[this.animationState]);
+                    this.players[0].animationState = AnimationState.loss;
                     console.log("Image path fin: " + this.players[1].textures[this.players[1].animationState]);
+                    this.drawPlayers();
 
                 } else {
 
@@ -473,8 +475,9 @@ class Battle {
             } else {
                 console.log(this.players[1].name + " fell in battle.");
                 this.players[0].animationState = AnimationState.win;
-                // console.log("Image path fin: " + textures[this.animationState]);
+                this.players[1].animationState = AnimationState.loss;
                 console.log("Image path fin: " + this.players[0].textures[this.players[0].animationState]);
+                this.drawPlayers();
             }
 
             this.effects.forEach(e => e.tick());
