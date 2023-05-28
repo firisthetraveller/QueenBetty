@@ -300,3 +300,26 @@ ul {
 .category {
     font-weight: bold;
 }
+
+.life-gauge {
+    width: 200px;
+    height: 30px;
+    border: 1px solid #000;
+    position: relative;
+    padding: 0%;
+}
+
+.life-bar {
+    height: 100%;
+    background-color: green;
+    margin: 0%;
+}
+
+.life-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-weight: bold;
+}

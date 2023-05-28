@@ -152,4 +152,11 @@ Cela représente d'après le graphique ci-dessus un nombre important de caractè
 | ------------------------------- | ------------------------------------------------------------- |
 | $\frac{\alpha}{\alpha + \beta}$ | $\frac{\alpha \beta}{(\alpha + \beta)^2(\alpha + \beta + 1)}$ |
 
-<!--### Loi normale de Gauss-->
+### Loi normale de Gauss
+La loi de Gauss est la loi qui décrit des phénomènes naturels, et estime les erreurs probables.
+
+| Espérance | Variance   |
+| --------- | ---------- |
+| $\mu$     | $\sigma^2$ |
+
+On s'en sert ici pour ajouter de l'erreur dans l'affichage des points de vie.

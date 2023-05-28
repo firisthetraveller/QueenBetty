@@ -23,9 +23,12 @@ function beta(alpha, beta) {
  * @returns 
  */
 function gauss(e, s) {
-    const x = Math.random();
-    const sq = (x - s) / e;
-    return (1 / (s * Math.sqrt(2 * Math.PI))) * Math.exp((-1 / 2) * sq * sq);
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+
+    const z0 = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return z0 * s + e;
 }
 
 /**
@@ -246,7 +249,12 @@ class Character {
 
     drawLife() {
         let id = ((this.position === Position.left) ? "p1_life" : "p2_life");
-        document.getElementById(id).innerHTML = `${Math.max(0, this.hitPoints)} / ${HP_MAX}`;
+        let ratio = Math.floor(Math.max(0, this.hitPoints) * 100 / HP_MAX);
+        let error = ratio + Math.floor(3 * gauss(0, 2));
+        let color = ((error < 0) ? "background-color: red; " : "");
+        let code = `<div class="life-bar" style="width: ${Math.abs(error)}%; ${color} ${((this.position === Position.left) ? ("left: " + (100 - ratio) + "%;") : "")}"></div>
+                <span class="life-text">${ratio}% | Colored: ${error}%</span>`
+        document.getElementById(id).innerHTML = code;
     }
 
     /**
