@@ -91,8 +91,57 @@ function stringToBeta(s, a, b) {
     }).join("");
 }
 
-const CARDS_AT_TURN_START = 4;
 const HP_MAX = 1000;
+const PARAMETERS = {
+    "Beta alpha": 0.5,
+    "Beta beta": 0.5,
+    "Poisson": 6,
+    "Gauss moyenne": 0,
+    "Gauss écart-type": 2,
+    "Laplace mu": 20,
+    "Laplace b": 5
+}
+
+const snakeCase = string => {
+    return string.replace(/\W+/g, " ")
+        .split(/ |\B(?=[A-Z])/)
+        .map(word => word.toLowerCase())
+        .join('_');
+};
+
+function displayTinySlider(value, id) {
+    return (
+        `<input type="range" min="0" max="1" step="0.1" value="${value}" class="slider" id="${id}"></input>`
+    );
+}
+
+function displaySmallSlider(value, id) {
+    return (
+        `<input type="range" min="0" max="10" value="${value}" class="slider" id="${id}"></input>`
+    );
+}
+
+function displayBigSlider(value, id) {
+    return (
+        `<input type="range" min="0" max="40" value="${value}" class="slider" id="${id}"></input>`
+    );
+}
+
+function displaySliders() {
+    let slidersString = Object.keys(PARAMETERS).map(k => {
+        let str = `<label for="myRange-${snakeCase(k)} ">${k} :</label>`;
+        switch (k) {
+            case "Beta alpha": case "Beta beta": str += `${displayTinySlider(PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+            case "Laplace mu": str += `${displayBigSlider(PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+            default: str += `${displaySmallSlider(PARAMETERS[k], `myRange-${snakeCase(k)}`)}`
+        }
+        return str + "<br>";
+    }).join("\n");
+    document.querySelector(".slidecontainer").innerHTML = (
+        `<p>Gérez vous même les paramètres de lois !</p>
+        ${slidersString}`
+    );
+}
 
 const getNextProbabilities = (matrix, current) => {
     return matrix[current]
@@ -108,7 +157,7 @@ const getRandomInWeightedArray = (array) => {
         i++;
     }
 
-    return i;
+    return i - 1;
 }
 
 /**
@@ -220,6 +269,18 @@ class Stats {
 
 let stats = new Stats();
 
+const UniformMarkov = (n) => {
+    const tmp = [];
+    for (let i = 0; i < n; i++) {
+        tmp.push([]);
+        for (let j = 0; j < n; j++) {
+            tmp[i].push((1 / n));
+        }
+        console.log(tmp[i]);
+    }
+    return tmp;
+};
+
 class Character {
     /**
      * 
@@ -235,12 +296,14 @@ class Character {
         this.textures = textures;
         this.deck = new Deck();
         this.animationState = AnimationState.idle;
+        this.matrix = [];
+        this.state = 0;
     }
 
     draw() {
         let id = ((this.position === Position.left) ? "character1" : "character2");
 
-        document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="">`;
+        document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="" >`;
     }
 
     showEnd() {
@@ -250,10 +313,10 @@ class Character {
     drawLife() {
         let id = ((this.position === Position.left) ? "p1_life" : "p2_life");
         let ratio = Math.floor(Math.max(0, this.hitPoints) * 100 / HP_MAX);
-        let error = ratio + Math.floor(3 * gauss(0, 2));
+        let error = ratio + Math.floor(3 * gauss(PARAMETERS['Gauss moyenne'], PARAMETERS['Gauss écart-type']));
         let color = ((error < 0) ? "background-color: red; " : "");
-        let code = `<div class="life-bar" style="width: ${Math.abs(error)}%; ${color} ${((this.position === Position.left) ? ("left: " + (100 - ratio) + "%;") : "")}"></div>
-                <span class="life-text">${ratio}% | Colored: ${error}%</span>`
+        let code = `<div class="life-bar" style="width: ${Math.abs(error)}%; ${color} ${((this.position === Position.left) ? ("left: " + (100 - ratio) + " %; ") : "")}" ></div>
+        <span class="life-text">${ratio}% | Colored: ${error}%</span>`
         document.getElementById(id).innerHTML = code;
     }
 
@@ -299,12 +362,22 @@ class Character {
     }
 
     drawCard() {
-        return this.deck.drawCard();
+        if (this.matrix.length === 0) {
+            this.matrix = UniformMarkov(this.deck.cards.length);
+        }
+        return this.useMarkov();
     }
 
-    useMarkov(matrix) {
-        let probs = getNextProbabilities(matrix, this.state);
-        return this.deck[getRandomInWeightedArray(probs)];
+    setMarkov(matrix) {
+        this.matrix = matrix;
+    }
+
+    useMarkov() {
+        console.log(this.matrix);
+        let probs = getNextProbabilities(this.matrix, this.state);
+        let nextCardIndex = getRandomInWeightedArray(probs);
+        this.state = nextCardIndex;
+        return this.deck.cards[nextCardIndex];
     }
 }
 
@@ -359,8 +432,8 @@ class Card {
         return (
             `<div class="card" id="card-${this.cardId}">
                 <h3>${this.name}</h3>
-                <p>${stringToBeta(this.description, 0.5, 0.5)}</p>
-            </div>`
+                <p>${stringToBeta(this.description, PARAMETERS['Beta alpha'], PARAMETERS['Beta beta'])}</p>
+            </div >`
         );
     }
 }
@@ -555,6 +628,7 @@ class Ink {
     constructor() {
         this.blobs = [];
         this.delay = 3;
+        this.alphaTick();
     }
 
     remove(count) {
@@ -563,16 +637,19 @@ class Ink {
         }
     }
 
-    tick() {
+    alphaTick() {
         for (let blob of this.blobs) {
-            blob.opacity -= (1 / this.delay).toFixed(1);
-        }
-
-        let eventCount = estimationPoisson(6);
-        for (let i = 0; i < eventCount; i++) {
-            this.blobs.push(new Blob(laplace(20, 5)));
+            blob.opacity -= ((1 / (this.delay * 10)) + 0.02).toFixed(2);
         }
         this.draw();
+        setTimeout(() => this.alphaTick(), this.delay * 100);
+    }
+
+    tick() {
+        let eventCount = estimationPoisson(PARAMETERS['Poisson']);
+        for (let i = 0; i < eventCount; i++) {
+            this.blobs.push(new Blob(laplace(PARAMETERS['Laplace mu'], PARAMETERS['Laplace b'])));
+        }
         // In 3 seconds, remove them
         setTimeout(() => this.remove(eventCount), this.delay * 1000);
         setTimeout(() => this.tick(), 1000);
@@ -599,7 +676,17 @@ class Battle {
         this.players[0].addCard(DiceCard(3));
         this.players[0].addCard(BulletCard([0, 0.375, 0.375, 0.125, 0.125], 4));
 
-        this.players[1].addCard(UniformCard(10, 2));
+        this.players[1].addCard(CoinThrowCard(20));
+        this.players[1].addCard(GeometricCard(0.8, 2));
+        this.players[1].addCard(DiceCard(3));
+        this.players[1].addCard(BulletCard([0, 0.375, 0.375, 0.125, 0.125], 4));
+        this.players[1].setMarkov([
+            [0.0, 1, 0.0, 0.0],
+            [0.0, 0, 1, 0.0],
+            [0.0, 0, 0.0, 1],
+            [1, 0, 0.0, 0.0]
+        ]);
+        //this.players[1].addCard(UniformCard(10, 2));
 
         this.effects.push(Catastrophe(0.3, 9));
         this.effects.push(Blessing(0.5, 5));
@@ -656,18 +743,23 @@ class Battle {
 
         this.displayLife();
     }
+
+    start() {
+        battle.setup();
+        console.log("Setup: OK");
+
+        while (!battle.isOver()) {
+            battle.update();
+        }
+
+        battle.displayLife();
+        battle.showWinner();
+    }
 }
 
 let battle = new Battle();
 
-battle.setup();
-console.log("Setup: OK");
-
-while (!battle.isOver()) {
-    battle.update();
-}
-
-battle.displayLife();
-battle.showWinner();
+displaySliders();
+battle.start();
 
 stats.print();
