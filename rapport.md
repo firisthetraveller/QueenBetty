@@ -144,7 +144,7 @@ Cela revient à avoir une probabilité très forte d'avoir des nombres proches d
 | --------- | -------- |
 | $\mu$     | $2b^2$   |
 
-La taille des taches suit la loi de Laplace, par défaut avec $\mu = 20$ et $b = 5$, pour avoir des taches d'une taille tournant autour de $40$px et une disparité non négligeable.
+La taille des taches suit la loi de Laplace, par défaut avec $\mu = 20$ et $b = 5$, pour avoir des taches d'une taille tournant autour de $40$ px et une disparité non négligeable.
 
 ### Loi bêta
 La loi bêta est une loi à distribution continue, avec diverses fonctions de densité.
