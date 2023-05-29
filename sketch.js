@@ -147,11 +147,11 @@ function displayBigSlider(key, value, id) {
 
 function displaySliders() {
     let slidersString = Object.keys(PARAMETERS).map(k => {
-                let str = `<label for="myRange-${snakeCase(k)} ">${k} :</label>`;
-                switch (k) {
-                    case "Beta alpha":
-                    case "Beta beta":
-                        str += `${displayTinySlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+        let str = `<label for="myRange-${snakeCase(k)} ">${k} :</label>`;
+        switch (k) {
+            case "Beta alpha":
+            case "Beta beta":
+                str += `${displayTinySlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
             case "Laplace mu": str += `${displayBigSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
             default: str += `${displaySmallSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`
         }
@@ -490,8 +490,24 @@ class Card {
  * @param {Number} damage 
  * @returns 
  */
-const BaseAttackCard = (damage) => {
-    return new Card("Base attack", "A simple attack.", (target) => target.takeHit(damage));
+const BaseAttackCard = (damage, name = "Base attack", description = "A simple attack.") => {
+    return new Card(name, description, (target) => target.takeHit(damage));
+}
+
+const HyperBeamCard = (damage) => {
+    return BaseAttackCard(damage, "Hyperbeam", "A powerful attack but needs a turn to cool down.");
+}
+
+const CoolDownCard = () => {
+    return BaseAttackCard(0, "Cool down", "Unusable as is, it is followed by Hyperbeam.");
+}
+
+const ChargeUpCard = () => {
+    return BaseAttackCard(0, "Charge up", "Charges up, and it is followed by Solar Beam.");
+}
+
+const SolarBeamCard = (damage) => {
+    return BaseAttackCard(damage, "Solar Beam", "A very strong attack, but needs to be charged for one turn.");
 }
 
 /**
@@ -729,11 +745,20 @@ class Battle {
         this.players[1].addCard(GeometricCard(0.8, 2));
         this.players[1].addCard(DiceCard(3));
         this.players[1].addCard(BulletCard([0, 0.375, 0.375, 0.125, 0.125], 4));
-        this.players[1].setMarkov([
-            [0.0, 1, 0.0, 0.0],
-            [0.0, 0, 1, 0.0],
-            [0.0, 0, 0.0, 1],
-            [1, 0, 0.0, 0.0]
+        this.players[0].addCard(HyperBeamCard(20));
+        this.players[0].addCard(CoolDownCard());
+        this.players[0].addCard(ChargeUpCard());
+        this.players[0].addCard(SolarBeamCard(20));
+
+        this.players[0].setMarkov([
+            [1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 0, 1 / 6, 0],
+            [1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 0, 1 / 6, 0],
+            [1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 0, 1 / 6, 0],
+            [1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 0, 1 / 6, 0],
+            [0, 0, 0, 0, 0, 1, 0, 0],
+            [1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 0, 1 / 6, 0],
+            [0, 0, 0, 0, 0, 0, 0, 1],
+            [1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 0, 1 / 6, 0]
         ]);
         //this.players[1].addCard(UniformCard(10, 2));
 
