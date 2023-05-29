@@ -1,3 +1,5 @@
+/*** Distributions ***/
+
 const exp = (n, lambda) => 1 - Math.exp(-lambda * n);
 const expInv = (rand, lambda) => {
     let i = 0;
@@ -13,7 +15,10 @@ function beta(alpha, beta) {
 
     const x = Math.pow(u, 1 / alpha);
     const y = Math.pow(v, 1 / beta);
-    return x / (x + y);
+    const random = x / (x + y);
+
+    stats.addTry(`beta-a${alpha}-b${beta}`, random);
+    return random;
 }
 
 /**
@@ -28,7 +33,9 @@ function gauss(e, s) {
     while (v === 0) v = Math.random();
 
     const z0 = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-    return z0 * s + e;
+    const random = z0 * s + e;
+    stats.addTry(`gauss-e${e}-s${s}`, random);
+    return random;
 }
 
 /**
@@ -37,14 +44,12 @@ function gauss(e, s) {
  * @param {Number} b Intensité
  * @returns 
  */
-// function laplace(mu, b) {
-//     const x = Math.random();
-//     return (1 / (2 * b)) * Math.exp(-(Math.abs(x - mu)) / b);
-// }
-
 function laplace(mu, b) {
     const u = Math.random() - 0.5; // Generate a random number between -0.5 and 0.5
-    return -b * Math.sign(u) * Math.log(1 - 2 * Math.abs(u)) + mu;
+    const random = -b * Math.sign(u) * Math.log(1 - 2 * Math.abs(u)) + mu;
+
+    stats.addTry(`laplace-mu${mu}-b${b}`, random);
+    return random;
 }
 
 /**
@@ -78,6 +83,8 @@ function estimationPoisson(lambda) {
         k++;
     }
 
+    const random = k;
+    stats.addTry(`poisson-${lambda}`, k);
     return k;
 }
 
@@ -89,6 +96,10 @@ function stringToBeta(s, a, b) {
 
         return `<span style="font-size: ${Math.floor(rand * 14) + 1}px">${c}</span>`;
     }).join("");
+}
+
+function capitalize(s) {
+    return s[0].toUpperCase() + s.slice(1);
 }
 
 const HP_MAX = 1000;
@@ -147,6 +158,16 @@ function displaySliders() {
         `<p>Gérez vous même les paramètres de lois !</p>
         ${slidersString}`
     );
+}
+
+// Pop-up
+let popup = document.getElementById("popup");
+
+function openPopup() {
+    popup.classList.add("open-popup");
+}
+function closePopup() {
+    popup.classList.remove("open-popup");
 }
 
 const getNextProbabilities = (matrix, current) => {
@@ -263,13 +284,28 @@ class Stats {
     }
 
     print() {
+        openPopup();
         console.log("Stats:");
 
-        Object.keys(this.counts).forEach(key => {
-            console.log(key + " - For " + this.counts[key].length + " tries:");
-            console.log("Average: " + getAverage(this.counts[key]));
-            console.log("Variance: " + getVariance(this.counts[key]));
-        });
+        document.getElementById("popup-content").innerHTML =
+            Object.keys(this.counts).map(key => {
+                let keySplit = key.split("-");
+
+                return (
+                    `
+                    <tr>
+                        <td>${capitalize(keySplit[0])}</td>
+                        <td>${keySplit.slice(1).join(", ")}</td>
+                        <td>${this.counts[key].length}</td>
+                        <td>${getAverage(this.counts[key]).toFixed(4)}</td>
+                        <td>${getVariance(this.counts[key]).toFixed(4)}</td>
+                    </tr>
+                `
+                );
+                console.log(key + " - For " + this.counts[key].length + " tries:");
+                console.log("Average: " + getAverage(this.counts[key]));
+                console.log("Variance: " + getVariance(this.counts[key]));
+            }).join("\n");
     }
 };
 
@@ -463,7 +499,7 @@ const BernouilliCard = (parameter, damage) => {
         if (Math.random() > parameter) {
             console.log("Lucky! A strong hit landed!");
             target.takeHit(damage);
-            stats.addTry("Bernouilli: " + parameter, 1);
+            stats.addTry("Bernouilli-" + parameter, 1);
         } else {
             let rand = Math.floor(Math.random() * 3);
             switch (rand) {
@@ -477,7 +513,7 @@ const BernouilliCard = (parameter, damage) => {
                     console.log("The enemy swiftly dodged the attack. The attack missed.");
                     break;
             }
-            stats.addTry("Bernouilli: " + parameter, 0);
+            stats.addTry("Bernouilli-" + parameter, 0);
         }
     });
 };
@@ -487,7 +523,7 @@ const UniformCard = (maxRoll, damage) => {
         let roll = Math.floor(Math.random() * maxRoll) + 1;
         console.log("A '" + roll + "' has been rolled.");
         target.takeHit(roll * damage);
-        stats.addTry("Uniform: " + maxRoll, roll);
+        stats.addTry("Uniform-" + maxRoll, roll);
     });
 };
 
@@ -515,7 +551,7 @@ const BulletCard = (parameters, damage) => {
             target.takeHit(damage);
         }
         console.log(`Hit ${hitCount} times!`);
-        stats.addTry("Bullet: " + parameters, hitCount);
+        stats.addTry("Bullet-" + parameters, hitCount);
     });
 }
 
@@ -555,7 +591,7 @@ const GeometricCard = (parameter, damage) => {
                     console.log(target.name + " dodged the last one.");
             }
         }
-        stats.addTry("Geometric: " + parameter, i);
+        stats.addTry("Geometric-" + parameter, i);
 
         if (i > 1) {
             console.log(target.name + " took a total of " + damage * i + " damage.");
@@ -591,7 +627,7 @@ class Weather {
 
     arm() {
         this.countdown = expInv(Math.random(), this.parameter);
-        stats.addTry("Exponential: " + this.parameter, this.countdown);
+        stats.addTry("Exponential-" + this.parameter, this.countdown);
     }
 
     tick() {
@@ -671,6 +707,7 @@ class Battle {
         this.players = [];
         this.effects = [];
         this.ink = new Ink();
+        this.ink.tick();
     }
 
     setup() {
@@ -699,7 +736,6 @@ class Battle {
         this.effects.push(Blessing(0.5, 5));
 
         this.players[0].deck.draw();
-        this.ink.tick();
     }
 
     isOver() {
@@ -769,3 +805,8 @@ let battle = new Battle();
 
 displaySliders();
 battle.start();
+
+function restart() {
+    closePopup();
+    battle.start();
+}
