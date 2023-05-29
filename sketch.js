@@ -668,15 +668,16 @@ class Ink {
 
 class Battle {
     constructor() {
-        this.players = [
-            new Character("Player", Position.left, cacahueteTextures),
-            new Character("Bad Guy", Position.right, vertTextures)
-        ];
+        this.players = [];
         this.effects = [];
         this.ink = new Ink();
     }
 
     setup() {
+        this.players = [
+            new Character("Player", Position.left, cacahueteTextures),
+            new Character("Bad Guy", Position.right, vertTextures)
+        ];
         this.players[0].addCard(CoinThrowCard(20));
         this.players[0].addCard(GeometricCard(0.8, 2));
         this.players[0].addCard(DiceCard(3));
@@ -760,6 +761,7 @@ class Battle {
 
         battle.displayLife();
         battle.showWinner();
+        stats.print();
     }
 }
 
@@ -767,5 +769,3 @@ let battle = new Battle();
 
 displaySliders();
 battle.start();
-
-stats.print();
