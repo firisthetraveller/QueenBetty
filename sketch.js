@@ -109,21 +109,27 @@ const snakeCase = string => {
         .join('_');
 };
 
-function displayTinySlider(value, id) {
+function updateValue(id, newValue) {
+    console.log(`Updating value: ${id} to ${newValue}`);
+    PARAMETERS[id] = newValue;
+    console.log(`Updated successfully to ${PARAMETERS[id]}.`);
+}
+
+function displayTinySlider(key, value, id) {
     return (
-        `<input type="range" min="0" max="1" step="0.1" value="${value}" class="slider" id="${id}"></input>`
+        `<input type="range" min="0" max="1" step="0.1" onChange="updateValue('${key}', this.value)" value="${value}" class="slider" id="${id}"></input>`
     );
 }
 
-function displaySmallSlider(value, id) {
+function displaySmallSlider(key, value, id) {
     return (
-        `<input type="range" min="0" max="10" value="${value}" class="slider" id="${id}"></input>`
+        `<input type="range" min="0" max="10" onChange="updateValue('${key}', this.value)" value="${value}" class="slider" id="${id}"></input>`
     );
 }
 
-function displayBigSlider(value, id) {
+function displayBigSlider(key, value, id) {
     return (
-        `<input type="range" min="0" max="40" value="${value}" class="slider" id="${id}"></input>`
+        `<input type="range" min="0" max="40" onChange="updateValue('${key}', this.value)" value="${value}" class="slider" id="${id}"></input>`
     );
 }
 
@@ -131,9 +137,9 @@ function displaySliders() {
     let slidersString = Object.keys(PARAMETERS).map(k => {
         let str = `<label for="myRange-${snakeCase(k)} ">${k} :</label>`;
         switch (k) {
-            case "Beta alpha": case "Beta beta": str += `${displayTinySlider(PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
-            case "Laplace mu": str += `${displayBigSlider(PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
-            default: str += `${displaySmallSlider(PARAMETERS[k], `myRange-${snakeCase(k)}`)}`
+            case "Beta alpha": case "Beta beta": str += `${displayTinySlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+            case "Laplace mu": str += `${displayBigSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+            default: str += `${displaySmallSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`
         }
         return str + "<br>";
     }).join("\n");
