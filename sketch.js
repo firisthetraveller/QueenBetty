@@ -363,7 +363,7 @@ class Character {
         let error = ratio + Math.floor(3 * gauss(PARAMETERS['Gauss moyenne'], PARAMETERS['Gauss écart-type']));
         let color = ((error < 0) ? "background-color: red; " : "");
         let code = `<div class="life-bar" style="width: ${Math.abs(error)}%; ${color} ${((this.position === Position.left) ? ("left: " + (100 - ratio) + " %; ") : "")}" ></div>
-        <span class="life-text">${ratio}% | Colored: ${error}%</span>`
+        <span class="life-text">${ratio}% | Avec erreur: ${error}%</span>`
         document.getElementById(id).innerHTML = code;
     }
 
