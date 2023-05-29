@@ -769,10 +769,10 @@ class Battle {
         this.drawPlayers();
         this.players.forEach(p => p.resetAnimationState());
 
-        if (!this.players[1].isAlive()) {
-            document.getElementById('history').innerHTML = "Yaaaaay, you won! Refresh the page to retry.";
-            return;
-        }
+        // if (!this.players[1].isAlive()) {
+        //     document.getElementById('history').innerHTML = "Yaaaaay, you won! Refresh the page to retry.";
+        //     return;
+        // }
 
         this.players[1].attack(this.players[0]);
         this.drawPlayers();
