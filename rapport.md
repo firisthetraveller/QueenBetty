@@ -4,6 +4,9 @@ LUONG Guy\
 N'GOTTA Sarah\
 PORA Aude
 
+## Sources
+[Lien GitHub](https://github.com/firisthetraveller/QueenBetty)
+
 ## Description
 
 Une simulation de combat au tour par tour entre deux personnages, style [Pokémon](https://en.wikipedia.org/wiki/Pokémon), où toutes les attaques dépendent de loi de probabilités.
@@ -132,7 +135,7 @@ La taille de ces tâches suivent une loi de Laplace.
 
 C'est une loi à deux paramètres ($\mu$ et $b$), telle que $\mu$ représente le décalage à 0 du pic de probabilités, et $b$ étant inversement proportionnel à l'intensité du pic.
 
-![Image](https://upload.wikimedia.org/wikipedia/commons/8/89/Laplace_distribution_pdf.png)
+![Image](img/screenshots/laplace_distrib_wiki.png)
 Source : Wikipédia, [loi de Laplace](https://fr.wikipedia.org/wiki/Loi_de_Laplace_(probabilités))
 
 Cela revient à avoir une probabilité très forte d'avoir des nombres proches de $\mu$, mais qui s'étalent quand b est grand.
@@ -141,10 +144,12 @@ Cela revient à avoir une probabilité très forte d'avoir des nombres proches d
 | --------- | -------- |
 | $\mu$     | $2b^2$   |
 
+La taille des taches suit la loi de Laplace, par défaut avec $\mu = 20$ et $b = 5$, pour avoir des taches d'une taille tournant autour de $40$px et une disparité non négligeable.
+
 ### Loi bêta
 La loi bêta est une loi à distribution continue, avec diverses fonctions de densité.
 
-![Fonctions de densité](https://upload.wikimedia.org/wikipedia/commons/9/9a/Beta_distribution_pdf.png)
+![Fonctions de densité](img/screenshots/beta_distrib_wiki.png)
 
 Nous avons ici choisi de l'appliquer sur la taille des caractères lors de l'affichage des cartes, avec la taille des caractères suivant une loi bêta de paramètres $\alpha = 0.5$ et $\beta = 0.5$. 
 
@@ -168,6 +173,7 @@ On s'en sert ici pour ajouter de l'erreur dans l'affichage des points de vie.
 
 ## La simulation
 ![Image slider](img/screenshots/sliders.png)
+
 Il est possible de régler des paramètres des lois de probabilité !
 
 - En réglant le paramètre $\lambda$ de la loi de Poisson, on peut changer la fréquence d'apparition des taches noires.
