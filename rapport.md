@@ -9,11 +9,15 @@ PORA Aude
 
 ## Description
 
-Une simulation de combat au tour par tour entre deux personnages, style [Pokémon](https://en.wikipedia.org/wiki/Pokémon), où toutes les attaques dépendent de loi de probabilités.
+Pour illustrer le cours de mathématiques, nous avons décidé de réaliser un jeu de combat au tour par tour entre 2 personnages, le tout rythmé par 8 lois de probabilité. 
 
-Le combat se termine quand l'un des deux combattants tombe au combat en recevant un nombre de dégâts fixé.
+Le jeu est donc automatique et met en scène un combat entre 2 personnages (ordi contre ordi). Le combat se termine quand l’un des deux personnages atteint le quota de dégâts fixés préalablement.
 
-Des événements arrivent au cours du combat, infligeant des dommages aux deux joueurs ou les soigne.
+Les attaques, dégâts, défenses et autres événements sont gérés par les probabilités. 
+
+Certaines de ces probabilités peuvent être modifiées grâce aux sliders présents sur l'interface de jeu mais ces dernières n'interviennent pas dans l'issue finale du jeu, elles ne sont qu’esthétiques.
+
+Pas besoin de stresser et d'hésiter entre plusieurs cartes, l'ordinateur choisi la stratégie pour vous ! Il ne vous reste qu'à observer et profiter du duel.
 
 Dans ce rapport, nous allons décrire les différentes lois utilisées, leurs cas d'utilisation et les stratégies avec les chaînes de Markov tout en faisant des analogies à Pokémon.
 
@@ -193,6 +197,10 @@ Ce sont des structures de données à état associant une probabilité à une ac
 Ici, on s'en sert pour simuler les stratégies des personnages, et elles dépendent du coup précédemment utilisé. On peut ainsi représenter différents patterns ou comportements, des attaques qui doivent avoir un temps de charge (ex: [Lance-Soleil](https://www.pokepedia.fr/Lance-Soleil)) ou un temps de recul (ex: [Ultralaser](https://www.pokepedia.fr/Ultralaser)).
 
 ## Difficultés
-À la base, ce projet était censé être un jeu, mais par manque de temps et d'une manque de vision sur le temps que ça prendrait d'ajouter les interactions avec un joueur physique, nous avons décidé de le laisser en tant que simulation de combat au tour par tour.
+Au départ, nous avions prévu de faire un jeu. Le visiteur du site aurait ainsi pu choisir quelle carte jouer et réagir en fonction de son adversaire. Malheureusement, par manque de temps et et des attentes trop élevées, nous avons dû réduire la taille de notre projet pour le rendre fonctionnel. En effet, rajouter des interactions imprévisibles d’un joueur aurait demandé beaucoup plus de temps. C’est pour cela que nous avons opté pour une simulation de combat au tour à tour,  joué par l’ordinateur. 
 
-De plus, nous n'avons pas réussi à ralentir le rythme du jeu, résultant à des combats se déroulant instantanément, sans possibilité de voir les différentes interactions: notamment les `Catastrophes` et les `Bénédictions` qui auraient été intéressantes à montrer.
+Cependant, nous sommes tout de même satisfait du travail fourni car notre jeu, certes moins interactif que prévu, fonctionne et contient en tout 9 lois de probabilités !
+
+Il est vrai que nous ne sommes pas parvenus à ralentir le rythme du jeu et que de ce fait, les combats se déroulent instantanément, sans possibilité de voir les différentes intéractions (notamment les Catastrophes et les Bénédictions) qui auraient été intéressantes à montrer. Par ailleurs, la fenêtre des statistiques associée à la console du navigateur permet d’avoir une idée des intéractions probabilistes.
+
+De manière générale, nous sommes tout de même fiers d’avoir réussi à coder des probabilités et espérons que cette simulation de combat vous plaira.
