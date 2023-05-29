@@ -1,11 +1,18 @@
 # QueenBetty
+## Auteurs
+LUONG Guy\
+N'GOTTA Sarah\
+PORA Aude
+
 ## Description
 
-Une simulation de combat au tour par tour entre deux personnages, style Pokémon, où toutes les attaques dépendent de loi de probabilités.
+Une simulation de combat au tour par tour entre deux personnages, style [Pokémon](https://en.wikipedia.org/wiki/Pokémon), où toutes les attaques dépendent de loi de probabilités.
 
 Le combat se termine quand l'un des deux combattants tombe au combat en recevant un nombre de dégâts fixé.
 
 Des événements arrivent au cours du combat, infligeant des dommages aux deux joueurs ou les soigne.
+
+Dans ce rapport, nous allons décrire les différentes lois utilisées, leurs cas d'utilisation et les stratégies avec les chaînes de Markov tout en faisant des analogies à Pokémon.
 
 ## Lois utilisées
 
@@ -23,6 +30,8 @@ Exemple :
 >Pour un lancer de dé (à valeurs de 1 à 6), on obtient un 4. On multiplie ce résultat par un scalaire $x$ donné, et ça détermine le nombre total de dommages.
 >
 >Dommages totaux = $4 * x$
+
+On s'en sert aussi pour l'affichage de texte dans le terminal dans le cas d'une certaine attaque, la position des taches affichées à l'écran (expliqué avec la loi de Poisson), etc.
 
 ### La **loi de Bernoulli**
 Assimilé à un lancer de pièce possiblement truqué, avec une probabilité de succès $p$, on l'utilise pour simuler une attaque risquée, infligeant beaucoup de dégâts en cas de succès, 0 dans le cas contraire.
@@ -94,9 +103,6 @@ $\qquad=10 - 9 = 1$
 
 Il est également possible de changer les probabilités $P(X = i)$ résultant en une nouvelle loi, dont l'espérance et la variance se calculent de la même façon.
 
-## Evénements
-On utilise ici deux lois de densité, à distribution continue.
-
 ### Loi exponentielle
 Une variable aléatoire réelle suivant une loi exponentielle représente le temps d'attente entre deux événements.
 
@@ -112,7 +118,6 @@ On obtient donc :
 - Avec $\lambda = 0.3$, à peu près tous les 3 tours, une `Catastrophe` se produit.
 - Avec $\lambda = 0.5$, en moyenne tous les 2 tours, une `Bénédiction` se produit.
 
-## Autres lois pour du n'importe quoi
 ### Loi de Poisson de paramètre $\lambda$
 Elle symbolise le nombre d'événements arrivant par unité de temps.
 
@@ -160,3 +165,13 @@ La loi de Gauss est la loi qui décrit des phénomènes naturels, et estime les 
 | $\mu$     | $\sigma^2$ |
 
 On s'en sert ici pour ajouter de l'erreur dans l'affichage des points de vie.
+
+## Les chaînes de Markov
+Ce sont des structures de données à état associant une probabilité à une action dépendant uniquement de l'état courant.
+
+Ici, on s'en sert pour simuler les stratégies des personnages, et elles dépendent du coup précédemment utilisé. On peut ainsi représenter différents patterns ou comportements, des attaques qui doivent avoir un temps de charge (ex: [Lance-Soleil](https://www.pokepedia.fr/Lance-Soleil)) ou un temps de recul (ex: [Ultralaser](https://www.pokepedia.fr/Ultralaser)).
+
+## Difficultés
+À la base, ce projet était censé être un jeu, mais par manque de temps et d'une manque de vision sur le temps que ça prendrait d'ajouter les interactions avec un joueur physique, nous avons décidé de le laisser en tant que simulation de combat au tour par tour.
+
+De plus, nous n'avons pas réussi à ralentir le rythme du jeu, résultant à des combats se déroulant instantanément, sans possibilité de voir les différentes interactions: notamment les `Catastrophes` et les `Bénédictions` qui auraient été intéressantes à montrer.
