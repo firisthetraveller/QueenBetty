@@ -11,7 +11,7 @@ PORA Aude
 
 Pour illustrer le cours de mathématiques, nous avons décidé de réaliser un jeu de combat au tour par tour entre 2 personnages, le tout rythmé par 8 lois de probabilité. 
 
-Le jeu est donc automatique et met en scène un combat entre 2 personnages (ordi contre ordi). Le combat se termine quand l’un des deux personnages atteint le quota de dégâts fixés préalablement.
+Le jeu est automatique et met en scène un combat entre 2 personnages (ordi contre ordi). Le combat se termine quand l’un des deux personnages atteint le quota de dégâts fixés préalablement.
 
 Les attaques, dégâts, défenses et autres événements sont gérés par les probabilités. 
 
