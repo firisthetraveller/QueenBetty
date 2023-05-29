@@ -20,11 +20,15 @@
     <header>
         <div class="player_zone">
             <img src="img/Cacahuete_en_attente.svg" alt="" class="profile">
-            <div class="player_life" id="p1_life"><!---auto-completed--></div>
+            <div class="player_life" id="p1_life">
+                <!---auto-completed-->
+            </div>
         </div>
         <h1>Electro-Nut Rumble</h1>
         <div class="pc_zone">
-            <div class="pc_life" id="p2_life"><!---auto-completed--></div>
+            <div class="pc_life" id="p2_life">
+                <!---auto-completed-->
+            </div>
             <img src="img/Vert_en_attente.svg" alt="" class="profile">
         </div>
     </header>
@@ -59,8 +63,6 @@
         <footer>
             <div class="footer_buttons">
                 <a href="index.html">&larr; Retour au menu</a>
-                <a href="" class="modal-button-rules">Règles</a>
-                <a href="" class="modal-button-commandes">Commandes</a>
             </div>
         </footer>
     </main>
@@ -98,20 +100,20 @@
         const closeButton = document.querySelectorAll('.close-button');
         let activeModal = null;
 
-        modalButtonRules.addEventListener('click', function (event) {
+        modalButtonRules.addEventListener('click', function(event) {
             event.preventDefault();
             modalRules.classList.add('active');
             activeModal = modalRules;
         });
 
-        modalButtonCommandes.addEventListener('click', function (event) {
+        modalButtonCommandes.addEventListener('click', function(event) {
             event.preventDefault();
             modalCommandes.classList.add('active');
             activeModal = modalCommandes;
         });
 
         for (let i = 0; i < closeButton.length; i++) {
-            closeButton[i].addEventListener('click', function () {
+            closeButton[i].addEventListener('click', function() {
                 activeModal.classList.remove('active');
                 activeModal = null;
             });
