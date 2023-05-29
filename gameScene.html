@@ -18,16 +18,17 @@
 
 <body class="container">
     <header>
+
         <div class="player_zone">
             <img src="img/Cacahuete_en_attente.svg" alt="" class="profile">
-            <div class="player_life" id="p1_life">
-                <!---auto-completed-->
+            <div class="life-gauge" id="p1_life">
+                <!--auto-completed-->
             </div>
         </div>
         <h1>Electro-Nut Rumble</h1>
         <div class="pc_zone">
-            <div class="pc_life" id="p2_life">
-                <!---auto-completed-->
+            <div class="life-gauge" id="p2_life">
+                <!--auto-completed-->
             </div>
             <img src="img/Vert_en_attente.svg" alt="" class="profile">
         </div>
@@ -59,7 +60,28 @@
                 <label for="myRange">Paramètre :</label>
                 <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
             </div>
+            <button type="btn-close" onclick="restart()">Relancer</button>
         </section>
+        <div class="popup" id="popup">
+            <img src="img/Cacahuete_en_attente.svg" alt="">
+            <h2>LES STATISTIQUES</h2>
+            <table id="popup-table">
+                <thead>
+                    <tr class="titles">
+                        <th>Loi</th>
+                        <th>Paramètre(s)</th>
+                        <th>Essais</th>
+                        <th>Espérance Calculée</th>
+                        <th>Variance Calculée</th>
+                    </tr>
+                </thead>
+                <tbody id="popup-content">
+                    <!--auto-completed-->
+                </tbody>
+            </table>
+            <button type="btn-close" onclick="closePopup()">Fermer</button>
+            <button type="btn-close" onclick="restart()">Relancer</button>
+        </div>
         <footer>
             <div class="footer_buttons">
                 <a href="index.html">&larr; Retour au menu</a>

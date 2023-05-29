@@ -1,3 +1,5 @@
+/*** Distributions ***/
+
 const exp = (n, lambda) => 1 - Math.exp(-lambda * n);
 const expInv = (rand, lambda) => {
     let i = 0;
@@ -13,7 +15,10 @@ function beta(alpha, beta) {
 
     const x = Math.pow(u, 1 / alpha);
     const y = Math.pow(v, 1 / beta);
-    return x / (x + y);
+    const random = x / (x + y);
+
+    stats.addTry(`beta-a${alpha}-b${beta}`, random);
+    return random;
 }
 
 /**
@@ -23,9 +28,14 @@ function beta(alpha, beta) {
  * @returns 
  */
 function gauss(e, s) {
-    const x = Math.random();
-    const sq = (x - s) / e;
-    return (1 / (s * Math.sqrt(2 * Math.PI))) * Math.exp((-1 / 2) * sq * sq);
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+
+    const z0 = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    const random = z0 * s + e;
+    stats.addTry(`gauss-e${e}-s${s}`, random);
+    return random;
 }
 
 /**
@@ -34,14 +44,12 @@ function gauss(e, s) {
  * @param {Number} b Intensité
  * @returns 
  */
-// function laplace(mu, b) {
-//     const x = Math.random();
-//     return (1 / (2 * b)) * Math.exp(-(Math.abs(x - mu)) / b);
-// }
-
 function laplace(mu, b) {
     const u = Math.random() - 0.5; // Generate a random number between -0.5 and 0.5
-    return -b * Math.sign(u) * Math.log(1 - 2 * Math.abs(u)) + mu;
+    const random = -b * Math.sign(u) * Math.log(1 - 2 * Math.abs(u)) + mu;
+
+    stats.addTry(`laplace-mu${mu}-b${b}`, random);
+    return random;
 }
 
 /**
@@ -75,6 +83,8 @@ function estimationPoisson(lambda) {
         k++;
     }
 
+    const random = k;
+    stats.addTry(`poisson-${lambda}`, k);
     return k;
 }
 
@@ -88,8 +98,77 @@ function stringToBeta(s, a, b) {
     }).join("");
 }
 
-const CARDS_AT_TURN_START = 4;
+function capitalize(s) {
+    return s[0].toUpperCase() + s.slice(1);
+}
+
 const HP_MAX = 1000;
+const PARAMETERS = {
+    "Beta alpha": 0.5,
+    "Beta beta": 0.5,
+    "Poisson": 6,
+    "Gauss moyenne": 0,
+    "Gauss écart-type": 2,
+    "Laplace mu": 20,
+    "Laplace b": 5
+}
+
+const snakeCase = string => {
+    return string.replace(/\W+/g, " ")
+        .split(/ |\B(?=[A-Z])/)
+        .map(word => word.toLowerCase())
+        .join('_');
+};
+
+function updateValue(id, newValue) {
+    console.log(`Updating value: ${id} to ${newValue}`);
+    PARAMETERS[id] = newValue;
+    console.log(`Updated successfully to ${PARAMETERS[id]}.`);
+}
+
+function displayTinySlider(key, value, id) {
+    return (
+        `<input type="range" min="0" max="1" step="0.1" onChange="updateValue('${key}', this.value)" value="${value}" class="slider" id="${id}"></input>`
+    );
+}
+
+function displaySmallSlider(key, value, id) {
+    return (
+        `<input type="range" min="0" max="10" onChange="updateValue('${key}', this.value)" value="${value}" class="slider" id="${id}"></input>`
+    );
+}
+
+function displayBigSlider(key, value, id) {
+    return (
+        `<input type="range" min="0" max="40" onChange="updateValue('${key}', this.value)" value="${value}" class="slider" id="${id}"></input>`
+    );
+}
+
+function displaySliders() {
+    let slidersString = Object.keys(PARAMETERS).map(k => {
+        let str = `<label for="myRange-${snakeCase(k)} ">${k} :</label>`;
+        switch (k) {
+            case "Beta alpha": case "Beta beta": str += `${displayTinySlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+            case "Laplace mu": str += `${displayBigSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+            default: str += `${displaySmallSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`
+        }
+        return str + "<br>";
+    }).join("\n");
+    document.querySelector(".slidecontainer").innerHTML = (
+        `<p>Gérez vous même les paramètres de lois !</p>
+        ${slidersString}`
+    );
+}
+
+// Pop-up
+let popup = document.getElementById("popup");
+
+function openPopup() {
+    popup.classList.add("open-popup");
+}
+function closePopup() {
+    popup.classList.remove("open-popup");
+}
 
 const getNextProbabilities = (matrix, current) => {
     return matrix[current]
@@ -105,7 +184,7 @@ const getRandomInWeightedArray = (array) => {
         i++;
     }
 
-    return i;
+    return i - 1;
 }
 
 /**
@@ -205,17 +284,44 @@ class Stats {
     }
 
     print() {
+        openPopup();
         console.log("Stats:");
 
-        Object.keys(this.counts).forEach(key => {
-            console.log(key + " - For " + this.counts[key].length + " tries:");
-            console.log("Average: " + getAverage(this.counts[key]));
-            console.log("Variance: " + getVariance(this.counts[key]));
-        });
+        document.getElementById("popup-content").innerHTML =
+            Object.keys(this.counts).map(key => {
+                let keySplit = key.split("-");
+
+                return (
+                    `
+                    <tr>
+                        <td>${capitalize(keySplit[0])}</td>
+                        <td>${keySplit.slice(1).join(", ")}</td>
+                        <td>${this.counts[key].length}</td>
+                        <td>${getAverage(this.counts[key]).toFixed(4)}</td>
+                        <td>${getVariance(this.counts[key]).toFixed(4)}</td>
+                    </tr>
+                `
+                );
+                console.log(key + " - For " + this.counts[key].length + " tries:");
+                console.log("Average: " + getAverage(this.counts[key]));
+                console.log("Variance: " + getVariance(this.counts[key]));
+            }).join("\n");
     }
 };
 
 let stats = new Stats();
+
+const UniformMarkov = (n) => {
+    const tmp = [];
+    for (let i = 0; i < n; i++) {
+        tmp.push([]);
+        for (let j = 0; j < n; j++) {
+            tmp[i].push((1 / n));
+        }
+        console.log(tmp[i]);
+    }
+    return tmp;
+};
 
 class Character {
     /**
@@ -232,12 +338,14 @@ class Character {
         this.textures = textures;
         this.deck = new Deck();
         this.animationState = AnimationState.idle;
+        this.matrix = [];
+        this.state = 0;
     }
 
     draw() {
         let id = ((this.position === Position.left) ? "character1" : "character2");
 
-        document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="">`;
+        document.getElementById(id).innerHTML = `<img src="${this.textures[this.animationState]}" alt="" >`;
     }
 
     showEnd() {
@@ -246,7 +354,12 @@ class Character {
 
     drawLife() {
         let id = ((this.position === Position.left) ? "p1_life" : "p2_life");
-        document.getElementById(id).innerHTML = `${Math.max(0, this.hitPoints)} / ${HP_MAX}`;
+        let ratio = Math.floor(Math.max(0, this.hitPoints) * 100 / HP_MAX);
+        let error = ratio + Math.floor(3 * gauss(PARAMETERS['Gauss moyenne'], PARAMETERS['Gauss écart-type']));
+        let color = ((error < 0) ? "background-color: red; " : "");
+        let code = `<div class="life-bar" style="width: ${Math.abs(error)}%; ${color} ${((this.position === Position.left) ? ("left: " + (100 - ratio) + " %; ") : "")}" ></div>
+        <span class="life-text">${ratio}% | Colored: ${error}%</span>`
+        document.getElementById(id).innerHTML = code;
     }
 
     /**
@@ -291,12 +404,22 @@ class Character {
     }
 
     drawCard() {
-        return this.deck.drawCard();
+        if (this.matrix.length === 0) {
+            this.matrix = UniformMarkov(this.deck.cards.length);
+        }
+        return this.useMarkov();
     }
 
-    useMarkov(matrix) {
-        let probs = getNextProbabilities(matrix, this.state);
-        return this.deck[getRandomInWeightedArray(probs)];
+    setMarkov(matrix) {
+        this.matrix = matrix;
+    }
+
+    useMarkov() {
+        console.log(this.matrix);
+        let probs = getNextProbabilities(this.matrix, this.state);
+        let nextCardIndex = getRandomInWeightedArray(probs);
+        this.state = nextCardIndex;
+        return this.deck.cards[nextCardIndex];
     }
 }
 
@@ -351,8 +474,8 @@ class Card {
         return (
             `<div class="card" id="card-${this.cardId}">
                 <h3>${this.name}</h3>
-                <p>${stringToBeta(this.description, 0.5, 0.5)}</p>
-            </div>`
+                <p>${stringToBeta(this.description, PARAMETERS['Beta alpha'], PARAMETERS['Beta beta'])}</p>
+            </div >`
         );
     }
 }
@@ -376,7 +499,7 @@ const BernouilliCard = (parameter, damage) => {
         if (Math.random() > parameter) {
             console.log("Lucky! A strong hit landed!");
             target.takeHit(damage);
-            stats.addTry("Bernouilli: " + parameter, 1);
+            stats.addTry("Bernouilli-" + parameter, 1);
         } else {
             let rand = Math.floor(Math.random() * 3);
             switch (rand) {
@@ -390,7 +513,7 @@ const BernouilliCard = (parameter, damage) => {
                     console.log("The enemy swiftly dodged the attack. The attack missed.");
                     break;
             }
-            stats.addTry("Bernouilli: " + parameter, 0);
+            stats.addTry("Bernouilli-" + parameter, 0);
         }
     });
 };
@@ -400,7 +523,7 @@ const UniformCard = (maxRoll, damage) => {
         let roll = Math.floor(Math.random() * maxRoll) + 1;
         console.log("A '" + roll + "' has been rolled.");
         target.takeHit(roll * damage);
-        stats.addTry("Uniform: " + maxRoll, roll);
+        stats.addTry("Uniform-" + maxRoll, roll);
     });
 };
 
@@ -428,7 +551,7 @@ const BulletCard = (parameters, damage) => {
             target.takeHit(damage);
         }
         console.log(`Hit ${hitCount} times!`);
-        stats.addTry("Bullet: " + parameters, hitCount);
+        stats.addTry("Bullet-" + parameters, hitCount);
     });
 }
 
@@ -468,7 +591,7 @@ const GeometricCard = (parameter, damage) => {
                     console.log(target.name + " dodged the last one.");
             }
         }
-        stats.addTry("Geometric: " + parameter, i);
+        stats.addTry("Geometric-" + parameter, i);
 
         if (i > 1) {
             console.log(target.name + " took a total of " + damage * i + " damage.");
@@ -504,7 +627,7 @@ class Weather {
 
     arm() {
         this.countdown = expInv(Math.random(), this.parameter);
-        stats.addTry("Exponential: " + this.parameter, this.countdown);
+        stats.addTry("Exponential-" + this.parameter, this.countdown);
     }
 
     tick() {
@@ -547,6 +670,7 @@ class Ink {
     constructor() {
         this.blobs = [];
         this.delay = 3;
+        this.alphaTick();
     }
 
     remove(count) {
@@ -555,16 +679,19 @@ class Ink {
         }
     }
 
-    tick() {
+    alphaTick() {
         for (let blob of this.blobs) {
-            blob.opacity -= (1 / this.delay).toFixed(1);
-        }
-
-        let eventCount = estimationPoisson(6);
-        for (let i = 0; i < eventCount; i++) {
-            this.blobs.push(new Blob(laplace(20, 5)));
+            blob.opacity -= ((1 / (this.delay * 10)) + 0.02).toFixed(2);
         }
         this.draw();
+        setTimeout(() => this.alphaTick(), this.delay * 100);
+    }
+
+    tick() {
+        let eventCount = estimationPoisson(PARAMETERS['Poisson']);
+        for (let i = 0; i < eventCount; i++) {
+            this.blobs.push(new Blob(laplace(PARAMETERS['Laplace mu'], PARAMETERS['Laplace b'])));
+        }
         // In 3 seconds, remove them
         setTimeout(() => this.remove(eventCount), this.delay * 1000);
         setTimeout(() => this.tick(), 1000);
@@ -577,27 +704,38 @@ class Ink {
 
 class Battle {
     constructor() {
+        this.players = [];
+        this.effects = [];
+        this.ink = new Ink();
+        this.ink.tick();
+    }
+
+    setup() {
         this.players = [
             new Character("Player", Position.left, cacahueteTextures),
             new Character("Bad Guy", Position.right, vertTextures)
         ];
-        this.effects = [];
-        this.ink = new Ink();
-    }
-
-    setup() {
         this.players[0].addCard(CoinThrowCard(20));
         this.players[0].addCard(GeometricCard(0.8, 2));
         this.players[0].addCard(DiceCard(3));
         this.players[0].addCard(BulletCard([0, 0.375, 0.375, 0.125, 0.125], 4));
 
-        this.players[1].addCard(UniformCard(10, 2));
+        this.players[1].addCard(CoinThrowCard(20));
+        this.players[1].addCard(GeometricCard(0.8, 2));
+        this.players[1].addCard(DiceCard(3));
+        this.players[1].addCard(BulletCard([0, 0.375, 0.375, 0.125, 0.125], 4));
+        this.players[1].setMarkov([
+            [0.0, 1, 0.0, 0.0],
+            [0.0, 0, 1, 0.0],
+            [0.0, 0, 0.0, 1],
+            [1, 0, 0.0, 0.0]
+        ]);
+        //this.players[1].addCard(UniformCard(10, 2));
 
         this.effects.push(Catastrophe(0.3, 9));
         this.effects.push(Blessing(0.5, 5));
 
         this.players[0].deck.draw();
-        this.ink.tick();
     }
 
     isOver() {
@@ -648,18 +786,27 @@ class Battle {
 
         this.displayLife();
     }
+
+    start() {
+        battle.setup();
+        console.log("Setup: OK");
+
+        while (!battle.isOver()) {
+            battle.update();
+        }
+
+        battle.displayLife();
+        battle.showWinner();
+        stats.print();
+    }
 }
 
 let battle = new Battle();
 
-battle.setup();
-console.log("Setup: OK");
+displaySliders();
+battle.start();
 
-while (!battle.isOver()) {
-    battle.update();
+function restart() {
+    closePopup();
+    battle.start();
 }
-
-battle.displayLife();
-battle.showWinner();
-
-stats.print();
