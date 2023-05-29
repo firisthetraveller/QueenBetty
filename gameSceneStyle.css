@@ -259,7 +259,7 @@ ul {
 }
 
 .slidersection {
-    width: 20%;
+    width: auto;
     padding: 15px;
     margin: 0 auto;
     margin-bottom: 20px;
@@ -331,10 +331,10 @@ ul {
     width: auto;
     background-color: white;
     border-radius: 50px;
-    position: fixed;
+    position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.1);
+    left: 80%;
+    transform: translate(-50%, -50%) scale(0.5);
     text-align: center;
     padding: 50px;
     color: #242424;
@@ -347,7 +347,7 @@ ul {
     visibility: visible;
     top: 50%;
     margin-top: 0;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(0.8);
 }
 
 .popup img {
