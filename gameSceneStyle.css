@@ -273,6 +273,7 @@ ul {
     -webkit-appearance: none;
     width: 50%;
     height: 15px;
+    margin: 10px;
     border-radius: 5px;
     background: #d3d3d3;
     outline: none;
@@ -330,8 +331,8 @@ ul {
     width: auto;
     background-color: white;
     border-radius: 50px;
-    position: absolute;
-    top: 0;
+    position: fixed;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.1);
     text-align: center;
@@ -339,11 +340,13 @@ ul {
     color: #242424;
     visibility: hidden;
     transition: transform 0.4s, top 0.4s;
+    border: 2px solid black;
 }
 
 .open-popup {
     visibility: visible;
     top: 50%;
+    margin-top: 0;
     transform: translate(-50%, -50%) scale(1);
 }
 

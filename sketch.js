@@ -28,7 +28,8 @@ function beta(alpha, beta) {
  * @returns 
  */
 function gauss(e, s) {
-    let u = 0, v = 0;
+    let u = 0,
+        v = 0;
     while (u === 0) u = Math.random();
     while (v === 0) v = Math.random();
 
@@ -70,7 +71,7 @@ function factorial(n) {
  * @returns 
  */
 function poisson(k, lambda) {
-    return Math.pow(lambda, k) * Math.exp(- lambda) / factorial(k);
+    return Math.pow(lambda, k) * Math.exp(-lambda) / factorial(k);
 }
 
 function estimationPoisson(lambda) {
@@ -146,9 +147,11 @@ function displayBigSlider(key, value, id) {
 
 function displaySliders() {
     let slidersString = Object.keys(PARAMETERS).map(k => {
-        let str = `<label for="myRange-${snakeCase(k)} ">${k} :</label>`;
-        switch (k) {
-            case "Beta alpha": case "Beta beta": str += `${displayTinySlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
+                let str = `<label for="myRange-${snakeCase(k)} ">${k} :</label>`;
+                switch (k) {
+                    case "Beta alpha":
+                    case "Beta beta":
+                        str += `${displayTinySlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
             case "Laplace mu": str += `${displayBigSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`; break;
             default: str += `${displaySmallSlider(k, PARAMETERS[k], `myRange-${snakeCase(k)}`)}`
         }
@@ -156,6 +159,8 @@ function displaySliders() {
     }).join("\n");
     document.querySelector(".slidecontainer").innerHTML = (
         `<p>Gérez vous même les paramètres de lois !</p>
+        <p>Les <strong>beta</strong> permettent de modifier l'affichage du texte dans les cartes.</p>
+        <p> Tout le reste permet de modifier l'affichage des cercles (s'ils sont trop embêtants, le secret est de mettre Poisson à 0!)</p>
         ${slidersString}`
     );
 }
