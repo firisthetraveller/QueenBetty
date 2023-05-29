@@ -166,6 +166,20 @@ La loi de Gauss est la loi qui décrit des phénomènes naturels, et estime les 
 
 On s'en sert ici pour ajouter de l'erreur dans l'affichage des points de vie.
 
+## La simulation
+![Image slider](img/screenshots/sliders.png)
+Il est possible de régler des paramètres des lois de probabilité !
+
+- En réglant le paramètre $\lambda$ de la loi de Poisson, on peut changer la fréquence d'apparition des taches noires.
+
+- Avec les paramètres de la loi de Laplace, on contrôle la taille des taches: $\mu$ contrôle la taille moyenne des taches et $b$ la variété de la grosseur de ces taches.
+
+Les paramètres des autres lois nécessitent un relancement d'un combat pour voir le résultat.
+
+- Les paramètres $\alpha$ et $\beta$ de la loi bêta contrôlent la grosseur de la taille du texte des cartes en bas de l'écran. Le paramètre $\alpha$ fait tendre la taille des lettres vers la taille d'origine, tandis que $\beta$ tend à les réduire au minimum. On joue donc avec un équilibre entre ces deux paramètres.
+
+- Les paramètres de la Loi de Gauss permettent d'ajouter de l'erreur dans l'affichage coloré de la barre de vie des personnages. La moyenne, par défaut à $0$, permet de situer la valeur autour de laquelle les valeurs vont être générées.
+
 ## Les chaînes de Markov
 Ce sont des structures de données à état associant une probabilité à une action dépendant uniquement de l'état courant.
 
