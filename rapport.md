@@ -156,6 +156,7 @@ Nous avons ici choisi de l'appliquer sur la taille des caractères lors de l'aff
 Cela représente d'après le graphique ci-dessus un nombre important de caractères ayant une taille proche de 0 et de la taille maximale donnée.
 
 ![Exemple dans le jeu](img/screenshots/loi_beta_texte.png)
+
 *Exemple d'application, on voit bien beaucoup de lettres de taille normale (les grandes), on voit surtout les lettres très petites, et peu de lettres intermédiaires.*
 
 | Espérance                       | Variance                                                      |
